@@ -23,5 +23,11 @@ int main()
 	donny.FillWithRandom();
 	std::cout << donny << '\n' << std::endl;
 	
+	auto bertie = donny.Block(1, 1, 2, 3);
+	std::cout << bertie << '\n' << std::endl;
+	bertie(1, 0) += 100;
+	std::cout << bertie << '\n' << std::endl;
+	std::cout << donny << '\n' << std::endl;
+	
 	std::cout << "Tester terminated normally" << std::endl;
 }

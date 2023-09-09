@@ -37,13 +37,13 @@ namespace Hoppy
 		{
 			m_DataStorage.FillWith(s);
 		}
-		
+
 		void FillWithRandom()
 		{
 			std::random_device rd;
 			std::mt19937 gen(rd());
 			std::uniform_real_distribution<double> dist(-1, 1);
-			
+
 			for (long i = 0; i < Dimension(); ++i)
 			{
 				for (long j = 0; j < Dimension(); ++j)
@@ -168,7 +168,6 @@ namespace Hoppy
 		}
 
 
-
 	public:
 		struct ScalarProxy;
 
@@ -216,6 +215,18 @@ namespace Hoppy
 		inline typename Eigen::MatrixX<Scalar>::DiagonalReturnType Diagonal() const
 		{
 			return (typename Eigen::MatrixX<Scalar>::DiagonalReturnType){*static_cast<Derived*>(this)};
+		}
+
+		struct BlockProxy;
+
+		inline BlockProxy Block(long leadingRow, long leadingColumn, long rowCount, long columnCount)
+		{
+			return BlockProxy{*static_cast<Derived*>(this), leadingRow, leadingColumn, rowCount, columnCount};
+		}
+
+		inline BlockProxy Block(long leadingRow, long leadingColumn, long rowCount, long columnCount) const
+		{
+			return BlockProxy{*static_cast<Derived*>(this), leadingRow, leadingColumn, rowCount, columnCount};
 		}
 
 		inline Scalar* Data()
@@ -629,6 +640,123 @@ namespace Hoppy
 
 		private:
 			Derived& r_Matrix;
+		};
+
+		struct BlockProxy
+		{
+			BlockProxy(Derived& matrix, long leadingRow, long leadingColumn, long rowCount, long columnCount)
+			    : r_Matrix(matrix), m_LeadingRow(leadingRow), m_LeadingColumn(leadingColumn), m_RowCount(rowCount),
+			      m_ColumnCount(columnCount)
+			{
+				assert(leadingRow >= 0 && "Invalid leading row index");
+				assert(leadingRow < matrix.Dimension() && "Invalid leading row index");
+				assert(leadingColumn >= 0 && "Invalid leading column index");
+				assert(leadingColumn < matrix.Dimension() && "Invalid leading column index");
+
+				assert(rowCount >= 0 && "Invalid row count");
+				assert(leadingRow + rowCount <= matrix.Dimension() && "Invalid row count");
+				assert(columnCount >= 0 && "Invalid column count");
+				assert(leadingColumn + columnCount <= matrix.Dimension() && "Invalid column count");
+			}
+
+			BlockProxy& operator=(const Eigen::MatrixX<Scalar>& matrix)
+			{
+				for (long i = 0; i < m_RowCount; i++)
+				{
+					for (long j = 0; j < m_ColumnCount; j++)
+					{
+						r_Matrix(i + m_LeadingRow, j + m_LeadingColumn) = matrix(i, j);
+					}
+				}
+
+				return *this;
+			}
+
+			void operator*=(Scalar s)
+			{
+				for (long i = m_LeadingRow; i < m_LeadingRow + m_RowCount; i++)
+				{
+					if (traits<Derived>::is_upper_critical)
+					{
+						for (long j = i; j < m_LeadingColumn + m_ColumnCount; j++)
+						{
+							r_Matrix(i, j) *= s;
+						}
+					}
+					else
+					{
+						for (long j = m_LeadingColumn; j <= i; j++)
+						{
+							r_Matrix(i, j) *= s;
+						}
+					}
+				}
+			}
+
+			void operator/=(Scalar s)
+			{
+				for (long i = m_LeadingRow; i < m_LeadingRow + m_RowCount; i++)
+				{
+					if (traits<Derived>::is_upper_critical)
+					{
+						for (long j = i; j < m_LeadingColumn + m_ColumnCount; j++)
+						{
+							r_Matrix(i, j) /= s;
+						}
+					}
+					else
+					{
+						for (long j = m_LeadingColumn; j <= i; j++)
+						{
+							r_Matrix(i, j) /= s;
+						}
+					}
+				}
+			}
+
+			inline ScalarProxy operator()(long row, long column)
+			{
+				return {r_Matrix, m_LeadingRow + row, m_LeadingColumn + column};
+			}
+
+			inline Scalar operator()(long row, long column) const
+			{
+				return {r_Matrix, m_LeadingRow + row, m_LeadingColumn + column};
+			}
+
+			friend inline std::ostream& operator<<(std::ostream& os, BlockProxy block)
+			{
+				return os << block.Eval();
+			}
+
+			// NOLINTNEXTLINE(google-explicit-constructor)
+			inline operator Eigen::MatrixX<Scalar>() const
+			{
+				return this->Eval();
+			}
+
+			Eigen::MatrixX<Scalar> Eval() const
+			{
+				Eigen::MatrixX<Scalar> result(m_RowCount, m_ColumnCount);
+
+				for (long i = 0; i < m_RowCount; i++)
+				{
+					for (long j = 0; j < m_ColumnCount; j++)
+					{
+						result(i, j) = r_Matrix(i + m_LeadingRow, j + m_LeadingColumn);
+					}
+				}
+
+				return result;
+			}
+
+
+		private:
+			Derived& r_Matrix;
+			long m_LeadingRow;
+			long m_LeadingColumn;
+			long m_RowCount;
+			long m_ColumnCount;
 		};
 
 
