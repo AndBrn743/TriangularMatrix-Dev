@@ -4,9 +4,24 @@
 
 #include <iostream>
 #include <Eigen/Eigen>
-#include <Eigen/Dense>
+
+#include "src/TriangularMatrix.hpp"
+
 
 int main()
 {
+	Hoppy::HermitianMatrix<double> hermi(5);
+	hermi.FillWithRandom();
+	hermi.Diagonal() *= 100;
+	std::cout << hermi << '\n' << std::endl;
+	
+	Hoppy::AntiSymmetricMatrix<double> amy(5);
+	amy.FillWithRandom();
+	std::cout << amy << '\n' << std::endl;
+	
+	Hoppy::LowerTriangularMatrix<double> donny(5);
+	donny.FillWithRandom();
+	std::cout << donny << '\n' << std::endl;
+	
 	std::cout << "Tester terminated normally" << std::endl;
 }
