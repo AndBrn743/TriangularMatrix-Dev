@@ -103,5 +103,6 @@ namespace Hoppy
 	struct traits<SymmetricMatrix<TScalar>>
 	{
 		using Scalar = TScalar;
+		static constexpr const bool is_upper_critical = false;
 	};
 }  // namespace Hoppy

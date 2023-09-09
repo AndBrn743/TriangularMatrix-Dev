@@ -83,5 +83,6 @@ namespace Hoppy
 	struct traits<UpperTriangularMatrix<TScalar>>
 	{
 		using Scalar = TScalar;
+		static constexpr const bool is_upper_critical = true;
 	};
 }  // namespace Hoppy

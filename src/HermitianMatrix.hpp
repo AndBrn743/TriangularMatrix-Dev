@@ -123,5 +123,6 @@ namespace Hoppy
 	struct traits<HermitianMatrix<TScalar>>
 	{
 		using Scalar = TScalar;
+		static constexpr const bool is_upper_critical = false;
 	};
 }  // namespace Hoppy
