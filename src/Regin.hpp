@@ -2,11 +2,10 @@
 // Created by Andy on 1/18/2023.
 //
 
+// ReSharper disable CppDFAUnreachableFunctionCall
 #pragma once
 
 #include <cassert>
-#include <cmath>
-#include <type_traits>
 
 #include "MathExt.hpp"
 
@@ -17,7 +16,7 @@
 ///       If you cannot guarantee this requirement, please invoke <code>Reg0</code> instead.
 /// \param i The 1st natual index
 /// \param j The 2nd natual index
-inline constexpr long unsafe_Regin0(long i, long j)
+constexpr long unsafe_Regin0(const long i, const long j)
 {
 	assert(i >= j
 	       && "Bad usage of `unsafe_Regin0`. \n\t-> Please either change the code to met the invoke condition or "
@@ -30,7 +29,7 @@ inline constexpr long unsafe_Regin0(long i, long j)
 /// Returns the regular (canonical) index of natual indices in <b>Natural Number</b> domain
 /// \param i The 1st natual index
 /// \param j The 2nd natual index
-inline constexpr long Regin0(long i, long j)
+constexpr long Regin0(const long i, const long j)
 {
 	return i >= j ? unsafe_Regin0(i, j) : unsafe_Regin0(j, i);
 }
@@ -42,7 +41,7 @@ inline constexpr long Regin0(long i, long j)
 ///       If you cannot guarantee this requirement, please invoke <code>Reg1</code> instead.
 /// \param i The 1st natual index
 /// \param j The 2nd natual index
-inline constexpr long unsafe_Regin1(long i, long j)
+constexpr long unsafe_Regin1(const long i, const long j)
 {
 	assert(i >= j
 	       && "Bad usage of `unsafe_Regin1`. \n\t-> Please either change the code to met the invoke condition or "
@@ -55,7 +54,7 @@ inline constexpr long unsafe_Regin1(long i, long j)
 /// Returns the regular (canonical) index of natual indices in <b>Positive Integer</b> domain
 /// \param i The 1st natual index
 /// \param j The 2nd natual index
-inline constexpr long Regin1(long i, long j)
+constexpr long Regin1(const long i, const long j)
 {
 	return i >= j ? unsafe_Regin1(i, j) : unsafe_Regin1(j, i);
 }
@@ -67,7 +66,7 @@ inline constexpr long Regin1(long i, long j)
 /// \param j The 2nd natual index from the 1st index pair
 /// \param k The 1st natual index from the 2nd index pair
 /// \param l The 2nd natual index from the 2nd index pair
-inline constexpr long Regin0(long i, long j, long k, long l)
+constexpr long Regin0(const long i, const long j, const long k, const long l)
 {
 	return Regin0(Regin0(i, j), Regin0(k, l));
 }
@@ -79,7 +78,7 @@ inline constexpr long Regin0(long i, long j, long k, long l)
 /// \param j The 2nd natual index from the 1st index pair
 /// \param k The 1st natual index from the 2nd index pair
 /// \param l The 2nd natual index from the 2nd index pair
-inline constexpr long Regin1(long i, long j, long k, long l)
+constexpr long Regin1(const long i, const long j, const long k, const long l)
 {
 	return Regin1(Regin1(i, j), Regin1(k, l));
 }
@@ -92,7 +91,7 @@ inline constexpr long Regin1(long i, long j, long k, long l)
 ///         <p><code>Reg0\<4\>(i) = Regin0(i, i, i, i)</code>
 /// \param i  The natual index
 template<int N>
-inline long Regin0(long i)
+long Regin0(const long i)
 {
 	static_assert(IsPowerOfTwo<int>(N), "Template parameter `N` must be a integer power of two");
 	if (N == 0)
@@ -113,25 +112,25 @@ inline long Regin0(long i)
 }
 
 template<>
-inline constexpr long Regin0<0>(__attribute__((unused)) long i)
+constexpr long Regin0<0>(const long)
 {
 	return 0;
 }
 
 template<>
-inline constexpr long Regin0<1>(long i)
+constexpr long Regin0<1>(const long i)
 {
 	return i;
 }
 
 template<>
-inline constexpr long Regin0<2>(long i)
+constexpr long Regin0<2>(const long i)
 {
 	return unsafe_Regin0(i, i);
 }
 
 template<>
-inline constexpr long Regin0<4>(long i)
+constexpr long Regin0<4>(const long i)
 {
 	auto result = unsafe_Regin0(i, i);
 	result = unsafe_Regin0(result, result);
@@ -146,7 +145,7 @@ inline constexpr long Regin0<4>(long i)
 ///         <p><code>Reg1\<4\>(i) = Regin1(i, i, i, i)</code>
 /// \param i  The natual index
 template<int N>
-inline constexpr long Regin1(long i)
+constexpr long Regin1(const long i)
 {
 	static_assert(IsPowerOfTwo<int>(N), "Template parameter `N` must be a integer power of two");
 	if (N == 0)
@@ -167,25 +166,25 @@ inline constexpr long Regin1(long i)
 }
 
 template<>
-inline constexpr long Regin1<0>(__attribute__((unused)) long i)
+constexpr long Regin1<0>(const long)
 {
 	return 1;
 }
 
 template<>
-inline constexpr long Regin1<1>(long i)
+constexpr long Regin1<1>(const long i)
 {
 	return i;
 }
 
 template<>
-inline constexpr long Regin1<2>(long i)
+constexpr long Regin1<2>(const long i)
 {
 	return unsafe_Regin1(i, i);
 }
 
 template<>
-inline constexpr long Regin1<4>(long i)
+constexpr long Regin1<4>(const long i)
 {
 	auto result = unsafe_Regin1(i, i);
 	result = unsafe_Regin1(result, result);
