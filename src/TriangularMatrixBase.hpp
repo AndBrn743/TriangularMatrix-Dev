@@ -13,8 +13,6 @@ namespace Hoppy
 		using Scalar = typename internal::traits<Derived>::Scalar;
 		using Base = TriangularBase<Derived>;
 		using Base::IsShapeAs;
-		using Base::IsSquare;
-		using Base::IsVector;
 		using Base::operator();
 		using Base::operator=;
 
