@@ -10,7 +10,7 @@ namespace Hoppy
 	class TriangularMatrixBase : public TriangularBase<Derived>
 	{
 	public:
-		using Scalar = typename internal::traits<Derived>::Scalar;
+		using Scalar = typename Eigen::internal::traits<Derived>::Scalar;
 		using Base = TriangularBase<Derived>;
 		using Base::IsShapeAs;
 		using Base::operator();

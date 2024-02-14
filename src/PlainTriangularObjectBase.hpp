@@ -12,7 +12,7 @@ namespace Hoppy
 	class PlainTriangularObjectBase : public TriangularMatrixBase<Derived>
 	{
 	public:
-		using Scalar = typename internal::traits<Derived>::Scalar;
+		using Scalar = typename Eigen::internal::traits<Derived>::Scalar;
 		using Base = TriangularMatrixBase<Derived>;
 		using Base::IsShapeAs;
 		// using Base::IsSquare;
@@ -21,19 +21,19 @@ namespace Hoppy
 		using Base::operator=;
 		// friend PlainSquareObjectBase<Base>;
 		typedef const PlainTriangularObjectBase& Nested;
-		static constexpr int DimensionAtCompileTime = internal::traits<Derived>::DimensionAtCompileTime;
+		static constexpr int DimensionAtCompileTime = Eigen::internal::traits<Derived>::DimensionAtCompileTime;
 
 
 	public:
 		PlainTriangularObjectBase() = default;
 
-		explicit PlainTriangularObjectBase(Index dimension)
+		explicit PlainTriangularObjectBase(Eigen::Index dimension)
 		    : m_storage(RequiredBufferSizeOf(dimension), RequiredBufferSizeOf(dimension), 1), m_dimension(dimension)
 		{
 			/* NO CODE */
 		}
 
-		explicit PlainTriangularObjectBase(const Index rowCount, const Index columnCount)
+		explicit PlainTriangularObjectBase(const Eigen::Index rowCount, const Eigen::Index columnCount)
 		    : m_storage(RequiredBufferSizeOf(rowCount, columnCount), RequiredBufferSizeOf(rowCount, columnCount), 1),
 		      m_dimension(rowCount)
 		{
@@ -51,7 +51,7 @@ namespace Hoppy
 			}
 		}
 
-		void Resize(const Index rowCount, const Index columnCount)
+		void Resize(const Eigen::Index rowCount, const Eigen::Index columnCount)
 		{
 			if (rowCount != columnCount)
 			{
@@ -61,28 +61,23 @@ namespace Hoppy
 			Resize(rowCount);
 		}
 
-		[[nodiscard]] Index rows() const
+		[[nodiscard]] Eigen::Index rows() const
 		{
 			return m_dimension;
 		}
 
-		[[nodiscard]] Index cols() const
+		[[nodiscard]] Eigen::Index cols() const
 		{
 			return m_dimension;
 		}
 
-		// [[nodiscard]] Index Size() const
-		// {
-		// 	return RowCount() * ColumnCount();
-		// }
-
-		[[nodiscard]] Index BufferSize() const
+		[[nodiscard]] Eigen::Index BufferSize() const
 		{
 			return RequiredBufferSizeOf(m_storage.rows(), m_storage.cols());
 		}
 #pragma clang diagnostic pop
 
-		[[nodiscard]] Index Dimension() const
+		[[nodiscard]] Eigen::Index Dimension() const
 		{
 			return m_dimension;
 		}
@@ -97,13 +92,13 @@ namespace Hoppy
 			return m_storage.data();
 		}
 
-		static Index RequiredBufferSizeOf(const Index rowCount, const Index columnCount)
+		static Eigen::Index RequiredBufferSizeOf(const Eigen::Index rowCount, const Eigen::Index columnCount)
 		{
 			assert(rowCount == columnCount && "vdsbuivjdZUYGDScefjabwu");
 			return RequiredBufferSizeOf(rowCount);
 		}
 
-		static Index RequiredBufferSizeOf(const Index dimension)
+		static Eigen::Index RequiredBufferSizeOf(const Eigen::Index dimension)
 		{
 			return Regin1<2>(dimension);
 		}
@@ -115,6 +110,6 @@ namespace Hoppy
 		                    1,
 		                    EIGEN_DEFAULT_MATRIX_STORAGE_ORDER_OPTION>
 		        m_storage;
-		internal::variable_if_dynamic<Index, DimensionAtCompileTime> m_dimension;
+		Eigen::internal::variable_if_dynamic<Eigen::Index, DimensionAtCompileTime> m_dimension;
 	};
 }  // namespace Hoppy

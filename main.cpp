@@ -40,7 +40,8 @@ int main()
 	std::cout << hermi.size() <<": " << hermi.rows() << " x " << hermi.cols() << std::endl;
 	std::cout << hermi << std::endl;
 
-	Eigen::Inverse<Hoppy::MatrixXcd> inv(hermi.ToFullMatrix());
+	Eigen::MatrixXd matt = Eigen::MatrixXd::Random(5, 5);
+	Eigen::Inverse<Eigen::MatrixXcd> inv(hermi.ToFullMatrix());
 	// Eigen::Inverse<Hoppy::HermitianMatrix<std::complex<double>, Eigen::Dynamic, 0>> inv2(hermi);
 	Eigen::MatrixXcd imv = inv;
 	std::cout << imv << std::endl;

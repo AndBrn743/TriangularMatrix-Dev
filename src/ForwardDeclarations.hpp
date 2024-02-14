@@ -8,24 +8,22 @@
 
 namespace Hoppy
 {
-	using namespace Eigen;
-
-	template <typename TScalar, int KDimensionAtCompileTime = Dynamic, int KOption = Eigen::RowMajor>
+	template <typename TScalar, int KDimensionAtCompileTime = Eigen::Dynamic, int KOption = Eigen::RowMajor>
 	class UpperTriangularMatrix;
 
-	template <typename TScalar, int KDimensionAtCompileTime = Dynamic, int KOption = Eigen::RowMajor>
+	template <typename TScalar, int KDimensionAtCompileTime = Eigen::Dynamic, int KOption = Eigen::RowMajor>
 	class LowerTriangularMatrix;
 
-	template <typename TScalar, int KDimensionAtCompileTime = Dynamic, int KOption = Eigen::RowMajor>
+	template <typename TScalar, int KDimensionAtCompileTime = Eigen::Dynamic, int KOption = Eigen::RowMajor>
 	class SymmetricMatrix;
 
-	template <typename TScalar, int KDimensionAtCompileTime = Dynamic, int KOption = Eigen::RowMajor>
+	template <typename TScalar, int KDimensionAtCompileTime = Eigen::Dynamic, int KOption = Eigen::RowMajor>
 	class AntiSymmetricMatrix;
 
-	template <typename TScalar, int KDimensionAtCompileTime = Dynamic, int KOption = Eigen::RowMajor>
+	template <typename TScalar, int KDimensionAtCompileTime = Eigen::Dynamic, int KOption = Eigen::RowMajor>
 	class HermitianMatrix;
 
-	template <typename TScalar, int KDimensionAtCompileTime = Dynamic, int KOption = Eigen::RowMajor>
+	template <typename TScalar, int KDimensionAtCompileTime = Eigen::Dynamic, int KOption = Eigen::RowMajor>
 	class AntiHermitianMatrix;
 
 	template <typename Derived>

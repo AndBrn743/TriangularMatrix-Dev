@@ -121,7 +121,7 @@ namespace Eigen
 	namespace internal
 	{
 		template <>
-		struct storage_kind_to_shape<Hoppy::TriangularCompressed>
+		struct storage_kind_to_shape<Eigen::TriangularCompressed>
 		{
 			typedef TriangularCompressedShape Shape;
 		};

@@ -7,25 +7,25 @@
 namespace Hoppy
 {
   template <typename Derived, int Level>
-  class TriangularCoeffsBase : public EigenBase<Derived>
+  class TriangularCoeffsBase : public Eigen::EigenBase<Derived>
   {
   public:
-    using Base = EigenBase<Derived>;
+    using Base = Eigen::EigenBase<Derived>;
     using Base::derived;
-    using Scalar = typename internal::traits<Derived>::Scalar;
+    using Scalar = typename Eigen::internal::traits<Derived>::Scalar;
 
-    auto operator()(Index i, Index j)
+    auto operator()(Eigen::Index i, Eigen::Index j)
     {
       assert(i >= 0 && i < derived().rows() && "Row index out of valid range");
       assert(j >= 0 && j < derived().cols() && "Column index out of valid range");
-      return internal::evaluator<Derived>(derived()).CoeffRef(i, j);
+      return Eigen::internal::evaluator<Derived>(derived()).CoeffRef(i, j);
     }
 
-    auto operator()(Index i, Index j) const
+	auto operator()(Eigen::Index i, Eigen::Index j) const
     {
       assert(i >= 0 && i < derived().rows() && "Row index out of valid range");
       assert(j >= 0 && j < derived().cols() && "Column index out of valid range");
-      return internal::evaluator<Derived>(derived()).coeff(i, j);
+      return Eigen::internal::evaluator<Derived>(derived()).coeff(i, j);
     }
   };
 }
