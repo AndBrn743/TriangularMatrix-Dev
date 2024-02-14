@@ -72,6 +72,12 @@ namespace Hoppy
 			{                                                                                                          \
 				using Scalar = TScalar;                                                                                \
 				static constexpr int DimensionAtCompileTime = KDimensionAtCompileTime;                                 \
+				static constexpr int RowsAtCompileTime = KDimensionAtCompileTime;                                      \
+				static constexpr int ColsAtCompileTime = KDimensionAtCompileTime;                                      \
+				static constexpr int MaxRowsAtCompileTime = KDimensionAtCompileTime;                                   \
+				static constexpr int MaxColsAtCompileTime = KDimensionAtCompileTime;                                   \
+				typedef int StorageIndex;                                                                              \
+				static constexpr int Option = KOption;                                                                 \
 				static constexpr bool IsUpperCritical =                                                                \
 				        std::is_same<Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>,                     \
 				                     Hoppy::UpperTriangularMatrix<TScalar, KDimensionAtCompileTime, KOption>>::value;  \
@@ -84,6 +90,12 @@ namespace Hoppy
 			{                                                                                                          \
 				using Scalar = const TScalar;                                                                          \
 				static constexpr int DimensionAtCompileTime = KDimensionAtCompileTime;                                 \
+				static constexpr int RowsAtCompileTime = KDimensionAtCompileTime;                                      \
+				static constexpr int ColsAtCompileTime = KDimensionAtCompileTime;                                      \
+				static constexpr int MaxRowsAtCompileTime = KDimensionAtCompileTime;                                   \
+				static constexpr int MaxColsAtCompileTime = KDimensionAtCompileTime;                                   \
+				typedef int StorageIndex;                                                                              \
+				static constexpr int Option = KOption;                                                                 \
 				static constexpr bool IsUpperCritical =                                                                \
 				        std::is_same<Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>,                     \
 				                     Hoppy::UpperTriangularMatrix<TScalar, KDimensionAtCompileTime, KOption>>::value;  \
@@ -96,6 +108,12 @@ namespace Hoppy
 			{                                                                                                          \
 				using Scalar = const TScalar;                                                                          \
 				static constexpr int DimensionAtCompileTime = KDimensionAtCompileTime;                                 \
+				static constexpr int RowsAtCompileTime = KDimensionAtCompileTime;                                      \
+				static constexpr int ColsAtCompileTime = KDimensionAtCompileTime;                                      \
+				static constexpr int MaxRowsAtCompileTime = KDimensionAtCompileTime;                                   \
+				static constexpr int MaxColsAtCompileTime = KDimensionAtCompileTime;                                   \
+				typedef int StorageIndex;                                                                              \
+				static constexpr int Option = KOption;                                                                 \
 				static constexpr bool IsUpperCritical =                                                                \
 				        std::is_same<Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>,                     \
 				                     Hoppy::UpperTriangularMatrix<TScalar, KDimensionAtCompileTime, KOption>>::value;  \
