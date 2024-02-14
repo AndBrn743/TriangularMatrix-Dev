@@ -14,12 +14,10 @@ namespace Hoppy
 	public:
 		using Scalar = typename Eigen::internal::traits<Derived>::Scalar;
 		using Base = TriangularMatrixBase<Derived>;
+		using Base::FillWith;
 		using Base::IsShapeAs;
-		// using Base::IsSquare;
-		// using Base::IsVector;
 		using Base::operator();
 		using Base::operator=;
-		// friend PlainSquareObjectBase<Base>;
 		typedef const PlainTriangularObjectBase& Nested;
 		static constexpr int DimensionAtCompileTime = Eigen::internal::traits<Derived>::DimensionAtCompileTime;
 
@@ -40,9 +38,33 @@ namespace Hoppy
 			assert(rowCount == columnCount && "vwbdcgsj");
 		}
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "HidingNonVirtualFunction"
-		void Resize(const Index dimension)
+		template <typename OtherDerived>
+		explicit PlainTriangularObjectBase(const Eigen::MatrixBase<OtherDerived>& other)
+		    : m_storage(RequiredBufferSizeOf(other.rows(), other.cols()),
+		                RequiredBufferSizeOf(other.rows(), other.cols()),
+		                1),
+		      m_dimension(other.rows())
+		{
+			// TODO: move to `TriangularMatrixBase`
+			assert(other.rows() == other.cols() && "vwbdcgsjfty");
+			FillWith([&other](Eigen::Index i, Eigen::Index j) -> Scalar { return other(i, j); });
+		}
+
+		template <typename OtherDerived>
+		explicit PlainTriangularObjectBase(const Eigen::EigenBase<OtherDerived>& other)
+		    : m_storage(RequiredBufferSizeOf(other.rows(), other.cols()),
+		                RequiredBufferSizeOf(other.rows(), other.cols()),
+		                1),
+		      m_dimension(other.rows())
+		{
+			// TODO: move to `TriangularMatrixBase`
+			assert(other.rows() == other.cols() && "vwbdcgsjftvdsy");
+			const Eigen::MatrixX<typename Eigen::internal::traits<OtherDerived>::Scalar> temp = other;
+			FillWith([&temp](Eigen::Index i, Eigen::Index j) -> Scalar { return temp(i, j); });
+		}
+
+
+		void Resize(const Eigen::Index dimension)
 		{
 			if (dimension != m_dimension)
 			{
@@ -61,6 +83,12 @@ namespace Hoppy
 			Resize(rowCount);
 		}
 
+		template <typename OtherDerived>
+		void ResizeAs(const Eigen::EigenBase<OtherDerived>& other)
+		{
+			Resize(other.rows(), other.cols());
+		}
+
 		[[nodiscard]] Eigen::Index rows() const
 		{
 			return m_dimension;
@@ -75,7 +103,6 @@ namespace Hoppy
 		{
 			return RequiredBufferSizeOf(m_storage.rows(), m_storage.cols());
 		}
-#pragma clang diagnostic pop
 
 		[[nodiscard]] Eigen::Index Dimension() const
 		{
