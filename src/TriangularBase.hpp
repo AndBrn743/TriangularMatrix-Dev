@@ -154,7 +154,15 @@ namespace Hoppy
 		/* NOLINTNEXTLINE(*-unconventional-assign-operator) */
 		Derived& operator=(const Eigen::EigenBase<OtherDerived>& rhs)
 		{
-			derived().Resize(rhs.RowCount(), rhs.ColumnCount());
+#if defined(EIGEN_NO_AUTOMATIC_RESIZING)
+			if (!IsShapeAs(rhs))
+			{
+				throw std::runtime_error(
+				        "Explicit resize operation is required as EIGEN_NO_AUTOMATIC_RESIZING was defined");
+			}
+#else
+			ResizeAs(rhs);
+#endif
 			return FillWith([&rhs](Eigen::Index i, Eigen::Index j) -> Scalar { return rhs.derived()(i, j); });
 		}
 
@@ -162,7 +170,11 @@ namespace Hoppy
 		/* NOLINTNEXTLINE(*-unconventional-assign-operator) */
 		Derived& operator+=(const Eigen::EigenBase<OtherDerived>& rhs)
 		{
-			derived().Resize(rhs.RowCount(), rhs.ColumnCount());
+			if (!IsShapeAs(rhs))
+			{
+				throw std::runtime_error("Operation cannot be performed for dimension mismatch(es)");
+			}
+
 			return IndependentCwiseOp([this, &rhs](Eigen::Index i, Eigen::Index j)
 			                          { (*this)(i, j) += rhs.derived()(i, j); });
 		}
@@ -171,7 +183,11 @@ namespace Hoppy
 		/* NOLINTNEXTLINE(*-unconventional-assign-operator) */
 		Derived& operator-=(const Eigen::EigenBase<OtherDerived>& rhs)
 		{
-			derived().Resize(rhs.RowCount(), rhs.ColumnCount());
+			if (!IsShapeAs(rhs))
+			{
+				throw std::runtime_error("Operation cannot be performed for dimension mismatch(es)");
+			}
+
 			return IndependentCwiseOp([this, &rhs](Eigen::Index i, Eigen::Index j)
 			                          { (*this)(i, j) -= rhs.derived()(i, j); });
 		}
