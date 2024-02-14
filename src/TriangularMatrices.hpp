@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace Eigen
+namespace Hoppy
 {
 	struct TriangularCompressed
 	{
@@ -18,7 +18,7 @@ namespace Eigen
 			return "TriangularCompressedShape";
 		}
 	};
-}  // namespace Eigen
+}  // namespace Hoppy
 
 #if defined(CREATE_PLAINTRIANGULAROBJECTBASE_BASED_MATRIX_CLASS)
 #undef CREATE_PLAINTRIANGULAROBJECTBASE_BASED_MATRIX_CLASS
@@ -76,7 +76,7 @@ namespace Eigen
 				        std::is_same<Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>,                     \
 				                     Hoppy::UpperTriangularMatrix<TScalar, KDimensionAtCompileTime, KOption>>::value;  \
 				static constexpr int Flags = DirectAccessBit | LvalueBit | NestByRefBit | RowMajorBit;                 \
-				using StorageKind = TriangularCompressed;                                                              \
+				using StorageKind = Hoppy::TriangularCompressed;                                                       \
 			};                                                                                                         \
                                                                                                                        \
 			template <typename TScalar, int KDimensionAtCompileTime, int KOption>                                      \
@@ -88,7 +88,7 @@ namespace Eigen
 				        std::is_same<Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>,                     \
 				                     Hoppy::UpperTriangularMatrix<TScalar, KDimensionAtCompileTime, KOption>>::value;  \
 				static constexpr int Flags = DirectAccessBit | LvalueBit | NestByRefBit | RowMajorBit;                 \
-				using StorageKind = TriangularCompressed;                                                              \
+				using StorageKind = Hoppy::TriangularCompressed;                                                       \
 			};                                                                                                         \
                                                                                                                        \
 			template <typename TScalar, int KDimensionAtCompileTime, int KOption>                                      \
@@ -100,7 +100,7 @@ namespace Eigen
 				        std::is_same<Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>,                     \
 				                     Hoppy::UpperTriangularMatrix<TScalar, KDimensionAtCompileTime, KOption>>::value;  \
 				static constexpr int Flags = DirectAccessBit | LvalueBit | NestByRefBit | RowMajorBit;                 \
-				using StorageKind = TriangularCompressed;                                                              \
+				using StorageKind = Hoppy::TriangularCompressed;                                                       \
 			};                                                                                                         \
 		}                                                                                                              \
 	}
@@ -121,9 +121,9 @@ namespace Eigen
 	namespace internal
 	{
 		template <>
-		struct storage_kind_to_shape<Eigen::TriangularCompressed>
+		struct storage_kind_to_shape<Hoppy::TriangularCompressed>
 		{
-			typedef TriangularCompressedShape Shape;
+			using Shape = Hoppy::TriangularCompressedShape;
 		};
 	}  // namespace internal
 }  // namespace Eigen
