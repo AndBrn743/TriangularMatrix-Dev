@@ -227,21 +227,21 @@ namespace Hoppy
 
 		void Resize(const Eigen::Index size)
 		{
-			Resize(size, 1);
+			Resize(size, size);
 		}
 
 		void Resize(Eigen::Index rowCount, Eigen::Index columnCount)
 		{
-			if (rowCount != derived().RowCount() || columnCount != derived().ColumnCount())
+			if (rowCount != derived().rows() || columnCount != derived().cols())
 			{
-				throw std::runtime_error("DenseBase::Resize(...) does not allow resize");
+				throw std::runtime_error("TriangularBase::Resize(...) does not allow resize");
 			}
 		}
 
 		template <typename OtherDerived>
 		void ResizeAs(const Eigen::EigenBase<OtherDerived>& other)
 		{
-			Resize(other.rows(), other.cols());
+			derived().Resize(other.rows(), other.cols());
 		}
 	};
 
