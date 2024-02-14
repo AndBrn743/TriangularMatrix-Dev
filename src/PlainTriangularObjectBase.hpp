@@ -16,6 +16,7 @@ namespace Hoppy
 		using Base = TriangularMatrixBase<Derived>;
 		using Base::FillWith;
 		using Base::IsShapeAs;
+		using Base::ResizeAs;
 		using Base::operator();
 		using Base::operator=;
 		typedef const PlainTriangularObjectBase& Nested;
@@ -25,40 +26,31 @@ namespace Hoppy
 	public:
 		PlainTriangularObjectBase() = default;
 
-		explicit PlainTriangularObjectBase(Eigen::Index dimension)
-		    : m_storage(RequiredBufferSizeOf(dimension), RequiredBufferSizeOf(dimension), 1), m_dimension(dimension)
+		explicit PlainTriangularObjectBase(const Eigen::Index dimension)
 		{
-			/* NO CODE */
+			Resize(dimension);
+			InitalizeMatrixElementsAccordingToMacro();
 		}
 
 		explicit PlainTriangularObjectBase(const Eigen::Index rowCount, const Eigen::Index columnCount)
 		    : m_storage(RequiredBufferSizeOf(rowCount, columnCount), RequiredBufferSizeOf(rowCount, columnCount), 1),
 		      m_dimension(rowCount)
 		{
-			assert(rowCount == columnCount && "vwbdcgsj");
+			Resize(rowCount, columnCount);
+			InitalizeMatrixElementsAccordingToMacro();
 		}
 
 		template <typename OtherDerived>
 		explicit PlainTriangularObjectBase(const Eigen::MatrixBase<OtherDerived>& other)
-		    : m_storage(RequiredBufferSizeOf(other.rows(), other.cols()),
-		                RequiredBufferSizeOf(other.rows(), other.cols()),
-		                1),
-		      m_dimension(other.rows())
 		{
-			// TODO: move to `TriangularMatrixBase`
-			assert(other.rows() == other.cols() && "vwbdcgsjfty");
+			ResizeAs(other);
 			FillWith([&other](Eigen::Index i, Eigen::Index j) -> Scalar { return other(i, j); });
 		}
 
 		template <typename OtherDerived>
 		explicit PlainTriangularObjectBase(const Eigen::EigenBase<OtherDerived>& other)
-		    : m_storage(RequiredBufferSizeOf(other.rows(), other.cols()),
-		                RequiredBufferSizeOf(other.rows(), other.cols()),
-		                1),
-		      m_dimension(other.rows())
 		{
-			// TODO: move to `TriangularMatrixBase`
-			assert(other.rows() == other.cols() && "vwbdcgsjftvdsy");
+			ResizeAs(other);
 			const Eigen::MatrixX<typename Eigen::internal::traits<OtherDerived>::Scalar> temp = other;
 			FillWith([&temp](Eigen::Index i, Eigen::Index j) -> Scalar { return temp(i, j); });
 		}
@@ -125,6 +117,22 @@ namespace Hoppy
 		{
 			return Regin1<2>(dimension);
 		}
+
+
+	private:
+		// ReSharper disable once CppMemberFunctionMayBeStatic
+		void InitalizeMatrixElementsAccordingToMacro()
+		{
+#if defined(EIGEN_INITIALIZE_MATRICES_BY_NAN)
+			FillWithNan();
+#if defined(EIGEN_INITIALIZE_MATRICES_BY_ZERO)
+#warning Both EIGEN_INITIALIZE_MATRICES_BY_ZERO and EIGEN_INITIALIZE_MATRICES_BY_NAN are defined
+#endif
+#elif defined(EIGEN_INITIALIZE_MATRICES_BY_ZERO)
+			FillWithZero();
+#endif
+		}
+
 
 	private:
 		Eigen::DenseStorage<Scalar,
