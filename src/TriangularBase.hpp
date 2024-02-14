@@ -68,6 +68,11 @@ namespace Hoppy
 			return FillWith(0);
 		}
 
+		Derived& FillWithNan()
+		{
+			return FillWith(std::numeric_limits<Scalar>::quiet_NaN());
+		}
+
 		Derived& FillWithRandom()
 		{
 			return FillWith([](Eigen::Index, Eigen::Index) -> Scalar { return Eigen::internal::random<Scalar>(); });
