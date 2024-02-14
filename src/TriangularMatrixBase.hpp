@@ -107,27 +107,31 @@ namespace Hoppy
 			return *this;
 		}
 
+		static constexpr bool IsCompileTimeHermitian()
+		{
+			return std::is_same<
+			               Eigen::EigenBase<Derived>,
+			               Eigen::EigenBase<HermitianMatrix<Scalar,
+			                                                Eigen::internal::traits<Derived>::DimensionAtCompileTime,
+			                                                Eigen::internal::traits<Derived>::Option>>>::value
+			       || (std::is_same<Eigen::EigenBase<Derived>,
+			                        Eigen::EigenBase<
+			                                SymmetricMatrix<Scalar,
+			                                                Eigen::internal::traits<Derived>::DimensionAtCompileTime,
+			                                                Eigen::internal::traits<Derived>::Option>>>::value
+			           && std::is_same<Scalar, decltype(Eigen::numext::real(Scalar(0)))>::value);
+		}
+
+
 		// TODO:
 		//       - EVD
 		//       - SVD
 		//       - etc.
 
 	private:
-		static void StaticAssertForHermitians()
+		static constexpr void StaticAssertForHermitians()
 		{
-			static_assert(
-			        std::is_same<
-			                Eigen::EigenBase<Derived>,
-			                Eigen::EigenBase<HermitianMatrix<Scalar,
-			                                                 Eigen::internal::traits<Derived>::DimensionAtCompileTime,
-			                                                 Eigen::internal::traits<Derived>::Option>>>::value
-			                || (std::is_same<Eigen::EigenBase<Derived>,
-			                                 Eigen::EigenBase<SymmetricMatrix<
-			                                         Scalar,
-			                                         Eigen::internal::traits<Derived>::DimensionAtCompileTime,
-			                                         Eigen::internal::traits<Derived>::Option>>>::value
-			                    && std::is_same<Scalar, decltype(Eigen::numext::real(Scalar(0)))>::value),
-			        "Method is for Hermitian (including real symmetric) matrices only");
+			static_assert(IsCompileTimeHermitian(), "Method is for Hermitian (including real symmetric) matrices only");
 		}
 	};
 }  // namespace Hoppy
