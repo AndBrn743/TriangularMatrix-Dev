@@ -156,6 +156,19 @@ namespace Hoppy
 			return derived();
 		}
 
+
+#define EIGEN_DOC_UNARY_ADDONS(X, Y)
+#define internal Eigen::internal
+#define NumTraits Eigen::NumTraits
+#define CwiseUnaryOp Eigen::CwiseUnaryOp
+#define CwiseUnaryView Eigen::CwiseUnaryView
+#include <Eigen/src/plugins/CommonCwiseUnaryOps.h>
+#undef internal
+#undef NumTraits
+#undef CwiseUnaryOp
+#undef CwiseUnaryView
+#undef EIGEN_DOC_UNARY_ADDONS
+
 		template <typename OtherDerived>
 		/* NOLINTNEXTLINE(*-unconventional-assign-operator) */
 		Derived& operator=(const Eigen::EigenBase<OtherDerived>& rhs)
