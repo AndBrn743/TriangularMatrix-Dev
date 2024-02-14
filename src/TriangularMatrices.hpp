@@ -2,6 +2,7 @@
 // Created by Andy on 2/13/2024.
 //
 
+// ReSharper disable CppRedundantNamespaceDefinition
 #pragma once
 
 namespace Hoppy
@@ -106,22 +107,17 @@ namespace Hoppy
 			};                                                                                                         \
                                                                                                                        \
 			template <typename TScalar, int KDimensionAtCompileTime, int KOption>                                      \
-			struct traits<const Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>&>                         \
+			struct traits<Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>&>                               \
+			    : traits<Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>>                                 \
 			{                                                                                                          \
-				using Scalar = const TScalar;                                                                          \
-				static constexpr int DimensionAtCompileTime = KDimensionAtCompileTime;                                 \
-				static constexpr int RowsAtCompileTime = KDimensionAtCompileTime;                                      \
-				static constexpr int ColsAtCompileTime = KDimensionAtCompileTime;                                      \
-				static constexpr int MaxRowsAtCompileTime = KDimensionAtCompileTime;                                   \
-				static constexpr int MaxColsAtCompileTime = KDimensionAtCompileTime;                                   \
-				using XprKind = MatrixXpr;                                                                             \
-				typedef int StorageIndex;                                                                              \
-				static constexpr int Option = KOption;                                                                 \
-				static constexpr bool IsUpperCritical =                                                                \
-				        std::is_same<Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>,                     \
-				                     Hoppy::UpperTriangularMatrix<TScalar, KDimensionAtCompileTime, KOption>>::value;  \
-				static constexpr int Flags = DirectAccessBit | LvalueBit | NestByRefBit | RowMajorBit;                 \
-				using StorageKind = Hoppy::TriangularCompressed;                                                       \
+				/* NO CODE */                                                                                          \
+			};                                                                                                         \
+                                                                                                                       \
+			template <typename TScalar, int KDimensionAtCompileTime, int KOption>                                      \
+			struct traits<const Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>&>                         \
+			    : traits<const Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>>                           \
+			{                                                                                                          \
+				/* NO CODE */                                                                                          \
 			};                                                                                                         \
 		}                                                                                                              \
 	}
