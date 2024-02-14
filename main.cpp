@@ -46,9 +46,22 @@ int main()
 	Eigen::MatrixXcd imv = inv;
 	std::cout << imv << std::endl;
 
-	Hoppy::MatrixXd matt(6, 9);
+	std::cout << matt << std::endl;
+	std::cout << hermi * matt << std::endl;
+	std::cout << matt * hermi << std::endl;
+	std::cout << hermi * hermi << std::endl;
+	std::cout << hermi.TransformedBy(matt) << std::endl;
 
-	using Vdsbhiv = Eigen::MatrixXd::BlockXpr;
+
+	const auto sqrt = hermi.Sqrt();
+	std::cout << "hermi:\n" << hermi << std::endl;
+	std::cout << "sqrt:\n" << sqrt << std::endl;
+	std::cout << "sqrt * sqrt:\n" << sqrt * sqrt << std::endl;
+
+	Hoppy::LowerTriangularMatrix<double> lucky(6);
+	lucky.FillWithRandom();
+	std::cout << "lucky:\n" << lucky << std::endl;
+	// std::cout << "lucky:\n" << lucky.Sqrt() << std::endl;
 
 
 	std::cout << "Tester terminated normally" << std::endl;
