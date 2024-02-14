@@ -212,21 +212,21 @@ namespace Hoppy
 
 		Eigen::MatrixX<Scalar> ToFullMatrix() const
 		{
-			Eigen::MatrixX<Scalar> result(derived().Dimension(), derived().Dimension());
+			Eigen::MatrixX<Scalar> result(derived().rows(), derived().cols());
 			CwiseOp([&result, this](Eigen::Index i, Eigen::Index j) { result(i, j) = (*this)(i, j); });
 			return result;
 		}
 
 		Eigen::MatrixX<Scalar> ExtractLowerToFullMatrix() const
 		{
-			Eigen::MatrixX<Scalar> result = Eigen::MatrixX<Scalar>::Zero(derived().Dimension(), derived().Dimension());
+			Eigen::MatrixX<Scalar> result = Eigen::MatrixX<Scalar>::Zero(derived().rows(), derived().cols());
 			LowerCwiseOp([&result, this](Eigen::Index i, Eigen::Index j) { result(i, j) = (*this)(i, j); });
 			return result;
 		}
 
 		Eigen::MatrixX<Scalar> ExtractUpperToFullMatrix() const
 		{
-			Eigen::MatrixX<Scalar> result = Eigen::MatrixX<Scalar>::Zero(derived().Dimension(), derived().Dimension());
+			Eigen::MatrixX<Scalar> result = Eigen::MatrixX<Scalar>::Zero(derived().rows(), derived().cols());
 			UpperCwiseOp([&result, this](Eigen::Index i, Eigen::Index j) { result(i, j) = (*this)(i, j); });
 			return result;
 		}
