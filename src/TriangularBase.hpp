@@ -225,8 +225,6 @@ namespace Hoppy
 			return result;
 		}
 
-
-	public:
 		void Resize(const Eigen::Index size)
 		{
 			Resize(size, 1);
@@ -238,6 +236,12 @@ namespace Hoppy
 			{
 				throw std::runtime_error("DenseBase::Resize(...) does not allow resize");
 			}
+		}
+
+		template <typename OtherDerived>
+		void ResizeAs(const Eigen::EigenBase<OtherDerived>& other)
+		{
+			Resize(other.rows(), other.cols());
 		}
 	};
 

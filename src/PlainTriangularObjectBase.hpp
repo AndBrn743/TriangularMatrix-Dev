@@ -83,12 +83,6 @@ namespace Hoppy
 			Resize(rowCount);
 		}
 
-		template <typename OtherDerived>
-		void ResizeAs(const Eigen::EigenBase<OtherDerived>& other)
-		{
-			Resize(other.rows(), other.cols());
-		}
-
 		[[nodiscard]] Eigen::Index rows() const
 		{
 			return m_dimension;
