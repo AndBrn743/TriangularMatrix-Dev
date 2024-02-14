@@ -77,9 +77,11 @@ namespace Hoppy
 		{
 			if (rowCount != columnCount)
 			{
-				std::cout << "fewvdkjsvszgu: ( " << rowCount << " != " << columnCount << " )" << std::endl;
+				throw std::runtime_error(
+				        std::string("Triangular compressed matrices can only be square (can't be resized to ")
+				        + std::to_string(rowCount) + " x " + std::to_string(columnCount) + " )");
 			}
-			assert(rowCount == columnCount && "fewvdkjsvszgu");
+
 			Resize(rowCount);
 		}
 
