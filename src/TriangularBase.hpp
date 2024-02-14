@@ -7,26 +7,10 @@
 namespace Hoppy
 {
 	template <typename Derived>
-	struct accessors_level
-	{
-		enum
-		{
-			// has_direct_access = (traits<Derived>::Flags & Eigen::DirectAccessBit) ? 1 : 0,
-			// has_write_access = (traits<Derived>::Flags & Eigen::LvalueBit) ? 1 : 0,
-			// value = has_direct_access ? (has_write_access ? Eigen::DirectWriteAccessors : Eigen::DirectAccessors)
-			//                           : (has_write_access ? Eigen::WriteAccessors : Eigen::ReadOnlyAccessors)
-			has_direct_access = 0,
-			has_write_access = 1,
-			value = has_direct_access ? (has_write_access ? Eigen::DirectWriteAccessors : Eigen::DirectAccessors)
-			                          : (has_write_access ? Eigen::WriteAccessors : Eigen::ReadOnlyAccessors)
-		};
-	};
-
-	template <typename Derived>
-	class TriangularBase : public TriangularCoeffsBase<Derived, accessors_level<Derived>::value>
+	class TriangularBase : public TriangularCoeffsBase<Derived, Eigen::internal::accessors_level<Derived>::value>
 	{
 	public:
-		using Base = TriangularCoeffsBase<Derived, accessors_level<Derived>::value>;
+		using Base = TriangularCoeffsBase<Derived, Eigen::internal::accessors_level<Derived>::value>;
 		using Scalar = typename Eigen::internal::traits<Derived>::Scalar;
 		using RealScalar = typename Eigen::NumTraits<Scalar>::Real;
 		using Base::cols;
