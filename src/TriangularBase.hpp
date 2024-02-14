@@ -36,6 +36,26 @@ namespace Hoppy
 		using Base::operator();
 		typedef const TriangularBase& Nested;
 
+		static constexpr int SizeAtCompileTime =
+		        Eigen::internal::traits<Derived>::RowsAtCompileTime != Eigen::Dynamic
+		                        && Eigen::internal::traits<Derived>::ColsAtCompileTime != Eigen::Dynamic
+		                ? Eigen::internal::traits<Derived>::RowsAtCompileTime
+		                          * Eigen::internal::traits<Derived>::ColsAtCompileTime
+		                : Eigen::Dynamic;
+		static constexpr int MaxSizeAtCompileTime = SizeAtCompileTime;
+		static constexpr bool IsVectorAtCompileTime = Eigen::internal::traits<Derived>::RowsAtCompileTime == 1
+		                                              || Eigen::internal::traits<Derived>::ColsAtCompileTime == 1;
+		using PlainObject = Eigen::Matrix<typename Eigen::internal::traits<Derived>::Scalar,
+		                                  Eigen::internal::traits<Derived>::RowsAtCompileTime,
+		                                  Eigen::internal::traits<Derived>::ColsAtCompileTime,
+		                                  Eigen::AutoAlign
+		                                          | (Eigen::internal::traits<Derived>::Flags & Eigen::RowMajorBit
+		                                                     ? Eigen::RowMajor
+		                                                     : Eigen::ColMajor),
+		                                  Eigen::internal::traits<Derived>::MaxRowsAtCompileTime,
+		                                  Eigen::internal::traits<Derived>::MaxColsAtCompileTime>;
+
+
 		// NOTE: The method is required by operator <<
 		EIGEN_DEVICE_FUNC auto coeff(const Eigen::Index i, const Eigen::Index j) const
 		{
@@ -159,7 +179,8 @@ namespace Hoppy
 		Derived& operator+=(const Eigen::EigenBase<OtherDerived>& rhs)
 		{
 			derived().Resize(rhs.RowCount(), rhs.ColumnCount());
-			return IndependentCwiseOp([this, &rhs](Eigen::Index i, Eigen::Index j) { (*this)(i, j) += rhs.derived()(i, j); });
+			return IndependentCwiseOp([this, &rhs](Eigen::Index i, Eigen::Index j)
+			                          { (*this)(i, j) += rhs.derived()(i, j); });
 		}
 
 		template <typename OtherDerived>
@@ -167,7 +188,8 @@ namespace Hoppy
 		Derived& operator-=(const Eigen::EigenBase<OtherDerived>& rhs)
 		{
 			derived().Resize(rhs.RowCount(), rhs.ColumnCount());
-			return IndependentCwiseOp([this, &rhs](Eigen::Index i, Eigen::Index j) { (*this)(i, j) -= rhs.derived()(i, j); });
+			return IndependentCwiseOp([this, &rhs](Eigen::Index i, Eigen::Index j)
+			                          { (*this)(i, j) -= rhs.derived()(i, j); });
 		}
 
 		/* NOLINTNEXTLINE(*-unconventional-assign-operator) */

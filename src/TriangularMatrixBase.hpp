@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "MathExt.hpp"
 #include "TriangularMatrices.hpp"
 #include <Eigen/Dense>
 #include <Eigen/Eigen>
@@ -23,6 +24,9 @@ namespace Hoppy
 		using Base::operator();
 		using Base::operator=;
 
+		using CoeffReturnType = Scalar;
+		using PlainObject = typename Base::PlainObject;
+
 
 		template <typename OtherDerived>
 		friend Eigen::Product<Derived, OtherDerived, Eigen::AliasFreeProduct> operator*(
@@ -39,11 +43,10 @@ namespace Hoppy
 		}
 
 		template <typename OtherDerived>
-		friend Eigen::MatrixX<Scalar> operator*(const TriangularMatrixBase& lhs,
-		                                        const TriangularMatrixBase<OtherDerived>& rhs)
+		friend Eigen::Product<Derived, OtherDerived, Eigen::AliasFreeProduct> operator*(
+		        const TriangularMatrixBase& lhs, const TriangularMatrixBase<OtherDerived>& rhs)
 		{
-			// TODO: change to Eigen::Product based implementation
-			return lhs.derived().ToFullMatrix() * rhs.derived().ToFullMatrix();
+			return {lhs.derived(), rhs.derived()};
 		}
 
 		Eigen::MatrixX<Scalar> Inverse() const
@@ -136,16 +139,18 @@ namespace Eigen
 	{
 
 		template <typename Lhs, typename Rhs>
-		struct generic_product_impl<Lhs,
-		                            Rhs,
-		                            Hoppy::TriangularCompressedShape,
-		                            typename storage_kind_to_shape<typename traits<Rhs>::StorageKind>::Shape,
-		                            GemmProduct>  // GEMM stands for generic matrix-matrix
+		struct generic_product_impl<
+		        Lhs,
+		        Rhs,
+		        Hoppy::TriangularCompressedShape,
+		        // typename storage_kind_to_shape<typename traits<Rhs>::StorageKind>::Shape,
+		        typename std::enable_if<
+		                !std::is_same<typename storage_kind_to_shape<typename traits<Rhs>::StorageKind>::Shape,
+		                              Hoppy::TriangularCompressedShape>::value,
+		                typename storage_kind_to_shape<typename traits<Rhs>::StorageKind>::Shape>::type,
+		        GemmProduct>  // GEMM stands for generic matrix-matrix
 		    : generic_product_impl_base<Lhs, Rhs, generic_product_impl<Lhs, Rhs>>
 		{
-			static_assert(!std::is_same<typename storage_kind_to_shape<typename traits<Rhs>::StorageKind>::Shape,
-			                            Hoppy::TriangularCompressedShape>::value,
-			              __FILE__);
 			typedef typename Product<Lhs, Rhs>::Scalar Scalar;
 
 			template <typename Dest>
@@ -157,22 +162,48 @@ namespace Eigen
 
 
 		template <typename Lhs, typename Rhs>
-		struct generic_product_impl<Lhs,
-		                            Rhs,
-		                            typename storage_kind_to_shape<typename traits<Lhs>::StorageKind>::Shape,
-		                            Hoppy::TriangularCompressedShape,
-		                            GemmProduct>  // GEMM stands for generic matrix-matrix
+		struct generic_product_impl<
+		        Lhs,
+		        Rhs,
+		        typename std::enable_if<
+		                !std::is_same<typename storage_kind_to_shape<typename traits<Lhs>::StorageKind>::Shape,
+		                              Hoppy::TriangularCompressedShape>::value,
+		                typename storage_kind_to_shape<typename traits<Lhs>::StorageKind>::Shape>::type,
+		        Hoppy::TriangularCompressedShape,
+		        GemmProduct>  // GEMM stands for generic matrix-matrix
 		    : generic_product_impl_base<Lhs, Rhs, generic_product_impl<Lhs, Rhs>>
 		{
-			static_assert(!std::is_same<typename storage_kind_to_shape<typename traits<Lhs>::StorageKind>::Shape,
-			                            Hoppy::TriangularCompressedShape>::value,
-			              __FILE__);
 			typedef typename Product<Lhs, Rhs>::Scalar Scalar;
 
 			template <typename Dest>
 			static void scaleAndAddTo(Dest& dst, const Lhs& lhs, const Rhs& rhs, const Scalar& alpha)
 			{
 				dst.noalias() += alpha * lhs * rhs.ToFullMatrix();
+			}
+		};
+
+
+		template <typename Derived, typename XprKind>
+		struct generic_xpr_base<Derived, XprKind, Hoppy::TriangularCompressed>
+		{
+			typedef Hoppy::TriangularMatrixBase<Derived> type;
+		};
+
+
+		template <typename Lhs, typename Rhs>
+		struct generic_product_impl<Lhs,
+		                            Rhs,
+		                            Hoppy::TriangularCompressedShape,
+		                            Hoppy::TriangularCompressedShape,
+		                            GemmProduct>  // GEMM stands for generic matrix-matrix
+		    : generic_product_impl_base<Lhs, Rhs, generic_product_impl<Lhs, Rhs>>
+		{
+			typedef typename Product<Lhs, Rhs>::Scalar Scalar;
+
+			template <typename Dest>
+			static void scaleAndAddTo(Dest& dst, const Lhs& lhs, const Rhs& rhs, const Scalar& alpha)
+			{
+				dst.noalias() += alpha * lhs.ToFullMatrix() * rhs.ToFullMatrix();
 			}
 		};
 

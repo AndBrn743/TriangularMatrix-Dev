@@ -76,6 +76,7 @@ namespace Hoppy
 				static constexpr int ColsAtCompileTime = KDimensionAtCompileTime;                                      \
 				static constexpr int MaxRowsAtCompileTime = KDimensionAtCompileTime;                                   \
 				static constexpr int MaxColsAtCompileTime = KDimensionAtCompileTime;                                   \
+				using XprKind = MatrixXpr;                                                                             \
 				typedef int StorageIndex;                                                                              \
 				static constexpr int Option = KOption;                                                                 \
 				static constexpr bool IsUpperCritical =                                                                \
@@ -94,6 +95,7 @@ namespace Hoppy
 				static constexpr int ColsAtCompileTime = KDimensionAtCompileTime;                                      \
 				static constexpr int MaxRowsAtCompileTime = KDimensionAtCompileTime;                                   \
 				static constexpr int MaxColsAtCompileTime = KDimensionAtCompileTime;                                   \
+				using XprKind = MatrixXpr;                                                                             \
 				typedef int StorageIndex;                                                                              \
 				static constexpr int Option = KOption;                                                                 \
 				static constexpr bool IsUpperCritical =                                                                \
@@ -112,6 +114,7 @@ namespace Hoppy
 				static constexpr int ColsAtCompileTime = KDimensionAtCompileTime;                                      \
 				static constexpr int MaxRowsAtCompileTime = KDimensionAtCompileTime;                                   \
 				static constexpr int MaxColsAtCompileTime = KDimensionAtCompileTime;                                   \
+				using XprKind = MatrixXpr;                                                                             \
 				typedef int StorageIndex;                                                                              \
 				static constexpr int Option = KOption;                                                                 \
 				static constexpr bool IsUpperCritical =                                                                \
