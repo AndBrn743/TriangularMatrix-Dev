@@ -203,48 +203,6 @@ namespace Hoppy
 			return result;
 		}
 
-		Eigen::MatrixX<Scalar> Inverse() const
-		{
-			return ToFullMatrix().inverse();
-		}
-
-		template <typename OtherDerived>
-		friend Eigen::MatrixX<Scalar> operator*(const TriangularBase& m, const EigenBase<OtherDerived>& n)
-		{
-			return m.ToFullMatrix() * n;
-		}
-
-		template <typename OtherDerived>
-		friend Eigen::MatrixX<Scalar> operator*(const EigenBase<OtherDerived>& n, const TriangularBase& m)
-		{
-			return n * m.ToFullMatrix();
-		}
-
-		template <typename OtherDerived>
-		Derived TransformedBy(const EigenBase<OtherDerived>& n) const
-		{
-			auto copy = ToFullMatrix();
-			return n.derived().conjugate().transpose() * copy * n.derived();
-		}
-
-		template <typename OtherDerived>
-		Derived& TransformBy(const EigenBase<OtherDerived>& n)
-		{
-			return TransformedBy(n);
-		}
-
-		template <typename OtherDerived>
-		Derived InverseTransformedBy(const EigenBase<OtherDerived>& n) const
-		{
-			auto copy = ToFullMatrix();
-			return n.derived() * copy * n.derived().conjugate().transpose();
-		}
-
-		template <typename OtherDerived>
-		Derived& InverseTransformBy(const EigenBase<OtherDerived>& n)
-		{
-			return InverseTransformedBy(n);
-		}
 
 	public:
 		void Resize(const Eigen::Index size)
