@@ -78,7 +78,7 @@ namespace Hoppy
 				static constexpr int MaxRowsAtCompileTime = KDimensionAtCompileTime;                                   \
 				static constexpr int MaxColsAtCompileTime = KDimensionAtCompileTime;                                   \
 				using XprKind = MatrixXpr;                                                                             \
-				typedef int StorageIndex;                                                                              \
+				using StorageIndex = Eigen::Index;                                                                     \
 				static constexpr int Option = KOption;                                                                 \
 				static constexpr bool IsUpperCritical =                                                                \
 				        std::is_same<Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>,                     \
@@ -97,7 +97,7 @@ namespace Hoppy
 				static constexpr int MaxRowsAtCompileTime = KDimensionAtCompileTime;                                   \
 				static constexpr int MaxColsAtCompileTime = KDimensionAtCompileTime;                                   \
 				using XprKind = MatrixXpr;                                                                             \
-				typedef int StorageIndex;                                                                              \
+				using StorageIndex = Eigen::Index;                                                                     \
 				static constexpr int Option = KOption;                                                                 \
 				static constexpr bool IsUpperCritical =                                                                \
 				        std::is_same<Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>,                     \
