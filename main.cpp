@@ -2,10 +2,11 @@
 // Created by Andy on 9/9/2023.
 //
 
-#include <iostream>
 #include <complex>
+#include <iostream>
 
 #include "Hoppy.hpp"
+#include "devtools/Tools.hpp"
 
 
 int main()
@@ -37,20 +38,25 @@ int main()
 	std::cout << hermi(2, 4) << std::endl;
 	// std::cout << hermi.RowCount() << " x " << hermi.ColumnCount() << std::endl;
 	std::cout << hermi.rows() << " x " << hermi.cols() << std::endl;
-	std::cout << hermi.size() <<": " << hermi.rows() << " x " << hermi.cols() << std::endl;
+	std::cout << hermi.size() << ": " << hermi.rows() << " x " << hermi.cols() << std::endl;
 	std::cout << hermi << std::endl;
 
 	Eigen::MatrixXd matt = Eigen::MatrixXd::Random(5, 5);
+	Eigen::MatrixXd mark = Eigen::MatrixXd::Random(6, 6);
+	Eigen::MatrixXd manny = Eigen::MatrixXd::Random(6, 9);
 	Eigen::Inverse<Eigen::MatrixXcd> inv(hermi.ToFullMatrix());
 	// Eigen::Inverse<Hoppy::HermitianMatrix<std::complex<double>, Eigen::Dynamic, 0>> inv2(hermi);
 	Eigen::MatrixXcd imv = inv;
 	std::cout << imv << std::endl;
 
-	std::cout << matt << std::endl;
-	std::cout << hermi * matt << std::endl;
-	std::cout << matt * hermi << std::endl;
-	std::cout << hermi * hermi << std::endl;
-	std::cout << hermi.TransformedBy(matt) << std::endl;
+	std::cout << "matt:\n" << matt << std::endl;
+	std::cout << "hermi * matt:\n" << hermi * matt << std::endl;
+	std::cout << "hermi * matt:\n" << hermi * matt << std::endl;
+	std::cout << "-hermi * matt:\n" << -hermi * matt << std::endl;
+	std::cout << "matt * hermi:\n" << matt * hermi << std::endl;
+	std::cout << "-matt * hermi:\n" << -matt * hermi << std::endl;
+	std::cout << "hermi * hermi:\n" << hermi * hermi << std::endl;
+	std::cout << "hermi.TransformedBy(matt):\n" << hermi.TransformedBy(matt) << std::endl;
 
 
 	const auto sqrt = hermi.Sqrt();
@@ -61,6 +67,30 @@ int main()
 	Hoppy::LowerTriangularMatrix<double> lucky(6);
 	lucky.FillWithRandom();
 	std::cout << "lucky:\n" << lucky << std::endl;
+
+
+	hermi = matt;
+	std::cout << "hermi <- matt:\n" << hermi << std::endl;
+
+	hermi = mark;
+	std::cout << "hermi <- mark:\n" << hermi << std::endl;
+
+	try
+	{
+		hermi = manny;
+		std::cout << "hermi <- manny:\n" << hermi << std::endl;
+
+		class UnexpectedExceptionMissException : std::exception
+		{
+			/* NO CODE */
+		};
+		throw UnexpectedExceptionMissException();
+	}
+	catch (const std::runtime_error& e)
+	{
+		std::cout << "Hit expected exception: " << e.what() << std::endl;
+	}
+
 	// std::cout << "lucky:\n" << lucky.Sqrt() << std::endl;
 
 
