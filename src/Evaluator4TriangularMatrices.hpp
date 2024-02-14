@@ -458,6 +458,8 @@ namespace Eigen
 			using Scalar = typename MatrixType::Scalar;
 			using CoeffReturnType = CoeffReturnProxy<const MatrixType>;
 			using RefCoeffReturnType = CoeffReturnProxy<MatrixType>;
+			static constexpr int CoeffReadCost = NumTraits<Scalar>::ReadCost;
+			static constexpr int Flags = traits<MatrixType>::Flags;
 
 			explicit evaluator(const MatrixType& m) : cr_matrix(m)
 			{

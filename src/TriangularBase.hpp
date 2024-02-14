@@ -18,8 +18,9 @@ namespace Hoppy
 		using Base::rows;
 		using Base::size;
 		using Base::operator();
-		typedef const TriangularBase& Nested;
+		using Nested = const TriangularBase&;
 
+		static constexpr int Flags = Eigen::internal::traits<Derived>::Flags;
 		static constexpr int SizeAtCompileTime =
 		        Eigen::internal::traits<Derived>::RowsAtCompileTime != Eigen::Dynamic
 		                        && Eigen::internal::traits<Derived>::ColsAtCompileTime != Eigen::Dynamic
