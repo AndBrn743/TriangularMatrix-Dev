@@ -41,12 +41,6 @@ namespace Hoppy
 		                                  Eigen::internal::traits<Derived>::MaxColsAtCompileTime>;
 
 
-		// NOTE: The method is required by operator <<
-		EIGEN_DEVICE_FUNC auto coeff(const Eigen::Index i, const Eigen::Index j) const
-		{
-			return (*this)(i, j);
-		}
-
 		friend std::ostream& operator<<(std::ostream& s, const TriangularBase& m)
 		{
 			return Eigen::internal::print_matrix(s, m, EIGEN_DEFAULT_IO_FORMAT);
