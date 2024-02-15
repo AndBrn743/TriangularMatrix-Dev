@@ -12,3 +12,4 @@
 #include "src/PlainTriangularObjectBase.hpp"
 #include "src/TriangularMatrices.hpp"
 #include "src/Evaluator4TriangularMatrices.hpp"
+#include "src/MapBase4TriangularCompressed.hpp"
