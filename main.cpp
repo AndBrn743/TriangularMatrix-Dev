@@ -91,7 +91,23 @@ int main()
 		std::cout << "Hit expected exception: " << e.what() << std::endl;
 	}
 
-	// std::cout << "lucky:\n" << lucky.Sqrt() << std::endl;
+	Eigen::ArrayX<std::complex<double>> buffer = Eigen::ArrayX<std::complex<double>>::Random(128);
+	std::cout << "BUFFER: " << buffer.transpose() << std::endl;
+	Hoppy::Map<Hoppy::HermitianMatrix<std::complex<double>>> mate(buffer.data(), 5);
+	std::cout << "mate: (" << mate.rows() << " x " << mate.cols() << ")\n"
+	          << mate(0, 0) << "  " << mate(0, 1) << "\n"
+	          << mate(1, 0) << "  " << mate(1, 1) << std::endl;
+	mate(1, 2) = std::complex<double>(1, 2);
+	std::cout << "mate:\n" << mate << std::endl;
+
+	Eigen::internal::triangular_compressed_block_impl<Hoppy::HermitianMatrix<std::complex<double>, -1, 0>, -1, -1> bob(
+	        hermi, 1, 2, 3, 4);
+	std::cout << "bob: " << bob.rows() << " x " << bob.cols() << ":\n"
+	          << bob << " |$| " << bob(0, 0) << " |$| " << bob.coeff(0, 0) << " |$| " << std::endl;
+
+	Eigen::internal::BlockImpl_dense<Eigen::MatrixXd> robert(matt, 1, 2, 3, 4);
+	std::cout << "robert: " << robert.rows() << " x " << robert.cols() << ":\n"
+	          << robert << " |%| " << robert(0, 0) << " |%| " << robert.coeff(0, 0) << std::endl;
 
 
 	std::cout << "Tester terminated normally" << std::endl;

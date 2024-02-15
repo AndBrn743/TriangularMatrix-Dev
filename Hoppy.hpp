@@ -13,3 +13,5 @@
 #include "src/TriangularMatrices.hpp"
 #include "src/Evaluator4TriangularMatrices.hpp"
 #include "src/MapBase4TriangularCompressed.hpp"
+#include "src/TriangularBlock.hpp"
+#include "src/Map.hpp"
