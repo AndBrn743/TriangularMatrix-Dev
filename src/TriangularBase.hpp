@@ -256,6 +256,14 @@ namespace Hoppy
 		{
 			derived().Resize(other.rows(), other.cols());
 		}
+
+
+	protected:
+		template <typename ...Args>
+		explicit TriangularBase(Args&&...)
+		{
+			/* NO CODE. Added only to treat invalid upcasting operation as compile error. */
+		}
 	};
 
 }  // namespace Hoppy

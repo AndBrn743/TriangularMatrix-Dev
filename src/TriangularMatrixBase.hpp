@@ -128,6 +128,14 @@ namespace Hoppy
 		//       - SVD
 		//       - etc.
 
+	protected:
+		template <typename... Args>
+		explicit TriangularMatrixBase(Args&&...)
+		{
+			/* NO CODE. Added only to treat invalid upcasting operation as compile error. */
+		}
+
+
 	private:
 		static constexpr void StaticAssertForHermitians()
 		{
