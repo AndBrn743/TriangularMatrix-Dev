@@ -77,12 +77,18 @@ namespace Hoppy
 				static constexpr int ColsAtCompileTime = KDimensionAtCompileTime;                                      \
 				static constexpr int MaxRowsAtCompileTime = KDimensionAtCompileTime;                                   \
 				static constexpr int MaxColsAtCompileTime = KDimensionAtCompileTime;                                   \
+				static constexpr int SizeAtCompileTime =                                                               \
+				        KDimensionAtCompileTime != Dynamic ? KDimensionAtCompileTime : Dynamic;                        \
+				static constexpr int MaxSizeAtCompileTime = SizeAtCompileTime;                                         \
+				static constexpr int InnerStrideAtCompileTime = 1;                                                     \
+				static constexpr int OuterStrideAtCompileTime = Dynamic;                                               \
 				using XprKind = MatrixXpr;                                                                             \
 				using StorageIndex = Eigen::Index;                                                                     \
 				static constexpr int Option = KOption;                                                                 \
 				static constexpr bool IsUpperCritical =                                                                \
 				        std::is_same<Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>,                     \
 				                     Hoppy::UpperTriangularMatrix<TScalar, KDimensionAtCompileTime, KOption>>::value;  \
+				static constexpr bool IsVectorAtCompileTime = KDimensionAtCompileTime == 1;                            \
 				static constexpr int Flags = DirectAccessBit | LvalueBit | NestByRefBit | RowMajorBit;                 \
 				using StorageKind = Hoppy::TriangularCompressed;                                                       \
 			};                                                                                                         \
@@ -96,12 +102,18 @@ namespace Hoppy
 				static constexpr int ColsAtCompileTime = KDimensionAtCompileTime;                                      \
 				static constexpr int MaxRowsAtCompileTime = KDimensionAtCompileTime;                                   \
 				static constexpr int MaxColsAtCompileTime = KDimensionAtCompileTime;                                   \
+				static constexpr int SizeAtCompileTime =                                                               \
+				        KDimensionAtCompileTime != Dynamic ? KDimensionAtCompileTime : Dynamic;                        \
+				static constexpr int MaxSizeAtCompileTime = SizeAtCompileTime;                                         \
+				static constexpr int InnerStrideAtCompileTime = 1;                                                     \
+				static constexpr int OuterStrideAtCompileTime = Dynamic;                                               \
 				using XprKind = MatrixXpr;                                                                             \
 				using StorageIndex = Eigen::Index;                                                                     \
 				static constexpr int Option = KOption;                                                                 \
 				static constexpr bool IsUpperCritical =                                                                \
 				        std::is_same<Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>,                     \
 				                     Hoppy::UpperTriangularMatrix<TScalar, KDimensionAtCompileTime, KOption>>::value;  \
+				static constexpr bool IsVectorAtCompileTime = KDimensionAtCompileTime == 1;                            \
 				static constexpr int Flags = DirectAccessBit | LvalueBit | NestByRefBit | RowMajorBit;                 \
 				using StorageKind = Hoppy::TriangularCompressed;                                                       \
 			};                                                                                                         \
