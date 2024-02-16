@@ -21,6 +21,20 @@ namespace Hoppy
 	};
 }  // namespace Hoppy
 
+
+namespace Eigen
+{
+	namespace internal
+	{
+		template <int ProductTag>
+		struct product_promote_storage_type<Hoppy::TriangularCompressed, Hoppy::TriangularCompressed, ProductTag>
+		{
+			using ret = Dense;
+		};
+	}  // namespace internal
+}  // namespace Eigen
+
+
 #if defined(CREATE_PLAINTRIANGULAROBJECTBASE_BASED_MATRIX_CLASS)
 #undef CREATE_PLAINTRIANGULAROBJECTBASE_BASED_MATRIX_CLASS
 #endif
