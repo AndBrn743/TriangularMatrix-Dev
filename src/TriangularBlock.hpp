@@ -8,33 +8,41 @@
 
 namespace Eigen
 {
-
-
 	namespace internal
 	{
-		template <typename XprType, int BlockRows, int BlockCols/*, bool InnerPanel = true*/>
+		template <typename XprType, int BlockRows, int BlockCols /*, bool InnerPanel = true*/>
 		class triangular_compressed_block_impl
-		    : public Hoppy::TriangularMatrixBase<XprType>
-		    // : public Hoppy::TriangularBase<triangular_compressed_block_impl<XprType, BlockRows, BlockCols>>
-		    // : public Hoppy::MapBase4TriangularCompressed<triangular_compressed_block_impl<XprType, BlockRows, BlockCols>>
+		    : public Hoppy::TriangularMatrixBase<Block<XprType, BlockRows, BlockCols>>
 		{
 		public:
-			using Scalar = typename traits<XprType>::Scalar;
-			using _MatrixTypeNested = typename internal::remove_all<typename XprType::Nested>::type;
-			using NestedExpression = typename internal::remove_all<typename XprType::Nested>::type;
-			// using BlockType = Block<XprType, BlockRows, BlockCols, true>;
-			// using Base = Hoppy::TriangularBase<BlockType>;
-			// using Base = Hoppy::MapBase4TriangularCompressed<triangular_compressed_block_impl<XprType, BlockRows, BlockCols>>;
-			using Base = Hoppy::TriangularMatrixBase<XprType>;
-			// using Base = Hoppy::TriangularBase<triangular_compressed_block_impl>;
+			using Base = TriangularMatrixBase<Block<XprType, BlockRows, BlockCols>>;
 			using Base::derived;
+			using Scalar = typename traits<XprType>::Scalar;
+			using NestedExpression = typename internal::remove_all<typename XprType::Nested>::type;
+			using BlockType = Block<XprType, BlockRows, BlockCols, true>;
 
-			triangular_compressed_block_impl(
-			        XprType& matrix, const int startRow, const int startCol, int blockRows, int blockCols)
+
+			triangular_compressed_block_impl() = delete;
+
+
+			triangular_compressed_block_impl(XprType& matrix,
+			                                 const Index startRow,
+			                                 const Index startCol,
+			                                 const Index blockRows,
+			                                 const Index blockCols)
 			    : r_matrix(matrix), m_startRow(startRow), m_startCol(startCol), m_blockRows(blockRows),
 			      m_blockCols(blockCols)
 			{
-				/* NO CODE */
+				if (startRow < 0 || startCol < 0 || startRow > matrix.rows() || startCol > matrix.cols())
+				{
+					throw std::runtime_error("Block start row and/or column in is not valid");
+				}
+				if (blockRows < 1 || blockCols < 1 || startRow + blockRows > matrix.rows()
+				    || startCol + blockCols > matrix.cols())
+				{
+					throw std::runtime_error(
+					        "Block row and/or column count in is not valid (non-postive or too large)");
+				}
 			}
 
 
@@ -105,6 +113,22 @@ namespace Eigen
 			const internal::variable_if_dynamic<Index, BlockCols> m_blockCols;
 		};
 
+
+		template <>
+		struct eval<Block<Hoppy::HermitianMatrix<std::complex<double>, -1, 0>>>
+		{
+			using type = Block<Hoppy::HermitianMatrix<std::complex<double>, -1, 0>>;
+		};
+
 	}  // namespace internal
+
+
+	template <typename TriangularCompressedMatrix, int KBlockRows, int KBlockCols, bool InnerPanel>
+	class BlockImpl<TriangularCompressedMatrix, KBlockRows, KBlockCols, InnerPanel, Hoppy::TriangularCompressed>
+	    : public internal::triangular_compressed_block_impl<TriangularCompressedMatrix, KBlockRows, KBlockCols>
+	{
+	public:
+		using Base = internal::triangular_compressed_block_impl<TriangularCompressedMatrix, KBlockRows, KBlockCols>;
+	};
 
 }  // namespace Eigen
