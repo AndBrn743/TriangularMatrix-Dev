@@ -41,10 +41,16 @@ namespace Hoppy
 		                                  Eigen::internal::traits<Derived>::MaxRowsAtCompileTime,
 		                                  Eigen::internal::traits<Derived>::MaxColsAtCompileTime>;
 
+		using EvalReturnType =
+		        typename Eigen::internal::add_const_on_value_type<typename Eigen::internal::eval<Derived>::type>::type;
+		EvalReturnType eval() const
+		{
+			return static_cast<typename Eigen::internal::eval<Derived>::type>(derived());
+		}
 
 		friend std::ostream& operator<<(std::ostream& s, const TriangularBase& m)
 		{
-			return Eigen::internal::print_matrix(s, m, EIGEN_DEFAULT_IO_FORMAT);
+			return Eigen::internal::print_matrix(s, m.eval(), EIGEN_DEFAULT_IO_FORMAT);
 		}
 
 		template <typename OtherDerived>
