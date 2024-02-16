@@ -39,6 +39,8 @@ int main()
 	// std::cout << hermi.RowCount() << " x " << hermi.ColumnCount() << std::endl;
 	std::cout << hermi.rows() << " x " << hermi.cols() << std::endl;
 	std::cout << hermi.size() << ": " << hermi.rows() << " x " << hermi.cols() << std::endl;
+	std::cout << TypeName<decltype(hermi)>() << std::endl;
+	std::cout << TypeName<decltype(hermi.derived())>() << std::endl;
 	std::cout << hermi << std::endl;
 
 	Eigen::MatrixXd matt = Eigen::MatrixXd::Random(5, 5);
@@ -53,9 +55,17 @@ int main()
 	std::cout << "hermi * matt:\n" << hermi * matt << std::endl;
 	std::cout << "hermi * matt:\n" << hermi * matt << std::endl;
 	std::cout << "-hermi * matt:\n" << -hermi * matt << std::endl;
+	std::cout << TypeName<decltype((-hermi * matt).eval())>() << std::endl;
+	std::cout << "(-hermi * matt).eval():\n" << (-hermi * matt).eval() << std::endl;
 	std::cout << "matt * hermi:\n" << matt * hermi << std::endl;
 	std::cout << "-matt * hermi:\n" << -matt * hermi << std::endl;
+	std::cout << TypeName<decltype((-matt * hermi).eval())>() << std::endl;
+	std::cout << "(-matt * hermi).eval():\n" << (-matt * hermi).eval() << std::endl;
 	std::cout << "hermi * hermi:\n" << hermi * hermi << std::endl;
+	std::cout << TypeName<decltype((hermi * hermi).eval())>() << std::endl;
+	std::cout << "(hermi * hermi).eval():\n" << (hermi * hermi).eval() << std::endl;
+	std::cout << TypeName<decltype((-hermi * hermi).eval())>() << std::endl;
+	std::cout << "(hermi * hermi).eval():\n" << (-hermi * hermi).eval() << std::endl;
 	std::cout << "hermi.TransformedBy(matt):\n" << hermi.TransformedBy(matt) << std::endl;
 
 
