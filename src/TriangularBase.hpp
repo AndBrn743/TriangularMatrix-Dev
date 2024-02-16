@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include "TriangularMatrices.hpp"
 
 namespace Hoppy
 {
@@ -259,7 +260,7 @@ namespace Hoppy
 
 
 	protected:
-		template <typename ...Args>
+		template <typename... Args>
 		explicit TriangularBase(Args&&...)
 		{
 			/* NO CODE. Added only to treat invalid upcasting operation as compile error. */
@@ -267,3 +268,33 @@ namespace Hoppy
 	};
 
 }  // namespace Hoppy
+
+
+namespace Eigen
+{
+	namespace internal
+	{
+		template <typename T>
+		struct plain_matrix_type<T, Hoppy::TriangularCompressed>
+		{
+		private:
+			using Traits = traits<T>;
+			using SpecficXprKind = typename Traits::SpecificXprKind;
+			using Scalar = typename Traits::Scalar;
+			static constexpr int Dimension = Traits::DimensionAtCompileTime;
+			static constexpr int Options = Traits::Option;
+
+		public:
+			// clang-format off
+			using type =
+				typename std::conditional<std::is_same<SpecficXprKind, HermitianMatrixXpr>::value, Hoppy::HermitianMatrix<Scalar, Dimension, Options>,
+				typename std::conditional<std::is_same<SpecficXprKind, AntiHermitianMatrixXpr>::value, Hoppy::AntiHermitianMatrix<Scalar, Dimension, Options>,
+				typename std::conditional<std::is_same<SpecficXprKind, SymmetricMatrixXpr>::value, Hoppy::SymmetricMatrix<Scalar, Dimension, Options>,
+				typename std::conditional<std::is_same<SpecficXprKind, AntiSymmetricMatrixXpr>::value, Hoppy::AntiSymmetricMatrix<Scalar, Dimension, Options>,
+				typename std::conditional<std::is_same<SpecficXprKind, UpperTriangularMatrixXpr>::value, Hoppy::UpperTriangularMatrix<Scalar, Dimension, Options>,
+				typename std::conditional<std::is_same<SpecficXprKind, LowerTriangularMatrixXpr>::value, Hoppy::LowerTriangularMatrix<Scalar, Dimension, Options>,
+				void>::type>::type>::type>::type>::type>::type;
+			// clang-format on
+		};
+	}  // namespace internal
+}  // namespace Eigen

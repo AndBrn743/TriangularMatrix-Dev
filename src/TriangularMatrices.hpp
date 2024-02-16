@@ -31,6 +31,12 @@ namespace Eigen
 		{
 			using ret = Dense;
 		};
+
+		template <typename T>
+		struct eval<T, Hoppy::TriangularCompressed>
+		{
+			using type = typename plain_matrix_type<T>::type;
+		};
 	}  // namespace internal
 }  // namespace Eigen
 
@@ -47,12 +53,8 @@ namespace Eigen
 		{                                                                                                              \
 		public:                                                                                                        \
 			using Base = PlainTriangularObjectBase<CLASS_NAME<_Scalar, _DimensionAtCompileTime, _Option>>;             \
-			/*friend Map<CLASS_NAME>;                           */                                                     \
-			/*friend MapBase<CLASS_NAME>;                       */                                                     \
-			/* friend MapBase<DenseBase<CLASS_NAME>>; */ /* Brown: Why i decided to add this line again? */            \
 			typedef const CLASS_NAME<_Scalar, _DimensionAtCompileTime, _Option>& Nested;                               \
 			typedef const CLASS_NAME<_Scalar, _DimensionAtCompileTime, _Option>& NestedExpression;                     \
-			using PlainObject = PlainTriangularObjectBase<CLASS_NAME<_Scalar, _DimensionAtCompileTime, _Option>>;      \
                                                                                                                        \
 		public:                                                                                                        \
 			CLASS_NAME() = default;                                                                                    \
@@ -80,6 +82,11 @@ namespace Eigen
                                                                                                                        \
 	namespace Eigen                                                                                                    \
 	{                                                                                                                  \
+		struct CLASS_NAME##Xpr                                                                                         \
+		{                                                                                                              \
+			/* NO CODE */                                                                                              \
+		};                                                                                                             \
+                                                                                                                       \
 		namespace internal                                                                                             \
 		{                                                                                                              \
 			template <typename TScalar, int KDimensionAtCompileTime, int KOption>                                      \
@@ -97,6 +104,7 @@ namespace Eigen
 				static constexpr int InnerStrideAtCompileTime = 1;                                                     \
 				static constexpr int OuterStrideAtCompileTime = Dynamic;                                               \
 				using XprKind = MatrixXpr;                                                                             \
+				using SpecificXprKind = CLASS_NAME##Xpr;                                                               \
 				using StorageIndex = Eigen::Index;                                                                     \
 				static constexpr int Option = KOption;                                                                 \
 				static constexpr bool IsUpperCritical =                                                                \
@@ -122,6 +130,7 @@ namespace Eigen
 				static constexpr int InnerStrideAtCompileTime = 1;                                                     \
 				static constexpr int OuterStrideAtCompileTime = Dynamic;                                               \
 				using XprKind = MatrixXpr;                                                                             \
+				using SpecificXprKind = CLASS_NAME##Xpr;                                                               \
 				using StorageIndex = Eigen::Index;                                                                     \
 				static constexpr int Option = KOption;                                                                 \
 				static constexpr bool IsUpperCritical =                                                                \
