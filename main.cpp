@@ -47,7 +47,6 @@ int main()
 	Eigen::MatrixXd mark = Eigen::MatrixXd::Random(6, 6);
 	Eigen::MatrixXd manny = Eigen::MatrixXd::Random(6, 9);
 	Eigen::Inverse<Eigen::MatrixXcd> inv(hermi.ToFullMatrix());
-	// Eigen::Inverse<Hoppy::HermitianMatrix<std::complex<double>, Eigen::Dynamic, 0>> inv2(hermi);
 	Eigen::MatrixXcd imv = inv;
 	std::cout << imv << std::endl;
 
@@ -88,50 +87,44 @@ int main()
 	          << mate(0, 0) << "  " << mate(0, 1) << "\n"
 	          << mate(1, 0) << "  " << mate(1, 1) << std::endl;
 	mate(1, 2) = std::complex<double>(1, 2);
-	// std::cout << "mate:\n" << mate << std::endl;  // FIXME
+	std::cout << "mate:\n" << mate << std::endl;
 
 	Eigen::internal::triangular_compressed_block_impl<Hoppy::HermitianMatrix<std::complex<double>, -1, 0>, -1, -1> bob(
 	        hermi, 1, 2, 4, 3);
 
-	std::cout << TypeName<typename Eigen::internal::eval<Eigen::Block<Hoppy::HermitianMatrix<std::complex<double>, -1, 0>, -1, -1, false>>::type>() << std::endl;
+	std::cout << TypeName<typename Eigen::internal::eval<
+	        Eigen::Block<Hoppy::HermitianMatrix<std::complex<double>, -1, 0>, -1, -1, false>>::type>()
+	          << std::endl;
 
 	std::cout << "bob: " << bob.rows() << " x " << bob.cols() << ":\n"
 	          << bob                         //
 	          << " |$| " << bob(0, 0)        //
 	          << " |$| " << bob.coeff(0, 0)  //
-	          // << " |$| " << static_cast<Hoppy::TriangularBase<Hoppy::HermitianMatrix<std::complex<double>, -1, 0>>>(bob).coeff(0, 0)  //
-	          // << " |$| " << static_cast<Hoppy::TriangularCoeffsBase<Hoppy::HermitianMatrix<std::complex<double>, -1, 0>, 0>>(bob).coeff(0, 0)  //
-	          // << " |$| " << static_cast<Hoppy::TriangularMatrixBase<Hoppy::HermitianMatrix<std::complex<double>, -1, 0>>>(bob).coeff(0, 0)  //
-	          << " |$| " << std::endl;
-	//
+	          << std::endl;
+
 	Eigen::internal::BlockImpl_dense<Eigen::MatrixXd> robert(matt, 1, 2, 4, 3);
 	std::cout << "robert: " << robert.rows() << " x " << robert.cols() << ":\n"
-	          << robert                   //
-	          << " |%| " << robert(0, 0)  //
-	          << " |%| "
-	          << robert.coeff(0, 0)  //
-	          // << " |%| " << static_cast<Eigen::DenseBase<Eigen::MatrixXd>>(robert).coeff(0, 0)  //  calling a private
-	          // constructor of class 'Eigen::DenseBase<Eigen::Matrix<double, -1, -1>>'
-	          // << " |%| " << static_cast<Eigen::DenseCoeffsBase<Eigen::MatrixXd,
-	          // Eigen::DirectWriteAccessors>>(robert).coeff(0, 0)  // error: no matching conversion for static_cast
-	          // << " |%| " << static_cast<Eigen::MatrixBase<Eigen::MatrixXd>>(robert).coeff(0, 0)  // calling a private
-	          // constructor of class 'Eigen::MatrixBase<Eigen::Matrix<double, -1, -1>>'
-	          // << " |%| "
-	          // << static_cast<Eigen::PlainObjectBase<Eigen::MatrixXd>>(robert).coeff(0, 0)  // calling a protected constructor of class
-	                            // 'Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1>>'
+	          << robert                         //
+	          << " |%| " << robert(0, 0)        //
+	          << " |%| " << robert.coeff(0, 0)  //
 	          << std::endl;
 
 	std::cout << TypeName<decltype(hermi.eval())>() << std::endl;
 	std::cout << TypeName<decltype(mate.eval())>() << std::endl;
 
-	std::cout << TypeName<Eigen::internal::eval<Eigen::Product<Hoppy::HermitianMatrix<double>, Eigen::MatrixXd>>::type>() << std::endl;
-	std::cout << TypeName<Eigen::internal::eval<Eigen::Product<Hoppy::HermitianMatrix<double>, Hoppy::HermitianMatrix<double>>>::type>() << std::endl;
-	std::cout << TypeName<Eigen::internal::eval<Eigen::Product<Hoppy::HermitianMatrix<std::complex<double>>, Hoppy::HermitianMatrix<std::complex<double>>>>::type>() << std::endl;
-	std::cout << TypeName<Eigen::internal::eval<Eigen::Product<Hoppy::HermitianMatrix<std::complex<double>, -1, 0>, Hoppy::HermitianMatrix<std::complex<double>, -1, 0>, 0>>::type>() << std::endl;
-	// std::cout << TypeName<Eigen::internal::eval<Eigen::Product<Hoppy::HermitianMatrix<std::complex<double>, -1, 0>, Hoppy::HermitianMatrix<std::complex<double>, -1, 0>, 2>>::type>() << std::endl;
-
-	// std::cout << TypeName<Eigen::internal::eval<Eigen::CwiseUnaryOp<Eigen::internal::scalar_opposite_op<std::complex<double>>, const Hoppy::HermitianMatrix<std::complex<double>, -1, 0>>>>() << std::endl;
-	// std::cout << TypeName<typename Eigen::internal::eval<Eigen::CwiseUnaryOp<Eigen::internal::scalar_opposite_op<std::complex<double>>, const Hoppy::HermitianMatrix<std::complex<double>, -1, 0>>>::type>() << std::endl;
+	std::cout
+	        << TypeName<Eigen::internal::eval<Eigen::Product<Hoppy::HermitianMatrix<double>, Eigen::MatrixXd>>::type>()
+	        << std::endl;
+	std::cout << TypeName<Eigen::internal::eval<
+	        Eigen::Product<Hoppy::HermitianMatrix<double>, Hoppy::HermitianMatrix<double>>>::type>()
+	          << std::endl;
+	std::cout << TypeName<Eigen::internal::eval<Eigen::Product<Hoppy::HermitianMatrix<std::complex<double>>,
+	                                                           Hoppy::HermitianMatrix<std::complex<double>>>>::type>()
+	          << std::endl;
+	std::cout << TypeName<Eigen::internal::eval<Eigen::Product<Hoppy::HermitianMatrix<std::complex<double>, -1, 0>,
+	                                                           Hoppy::HermitianMatrix<std::complex<double>, -1, 0>,
+	                                                           0>>::type>()
+	          << std::endl;
 
 	hermi = matt;
 	matt.operator=(mark);
@@ -155,24 +148,6 @@ int main()
 	{
 		std::cout << "Hit expected exception: " << e.what() << std::endl;
 	}
-
-	// Eigen::ArrayX<std::complex<double>> buffer = Eigen::ArrayX<std::complex<double>>::Random(128);
-	// std::cout << "BUFFER: " << buffer.transpose() << std::endl;
-	// Hoppy::Map<Hoppy::HermitianMatrix<std::complex<double>>> mate(buffer.data(), 5);
-	// std::cout << "mate: (" << mate.rows() << " x " << mate.cols() << ")\n"
-	//           << mate(0, 0) << "  " << mate(0, 1) << "\n"
-	//           << mate(1, 0) << "  " << mate(1, 1) << std::endl;
-	// mate(1, 2) = std::complex<double>(1, 2);
-	// std::cout << "mate:\n" << mate << std::endl;
-
-	// Eigen::internal::triangular_compressed_block_impl<Hoppy::HermitianMatrix<std::complex<double>, -1, 0>, -1, -1> bob(
-	//         hermi, 1, 2, 3, 4);
-	// std::cout << "bob: " << bob.rows() << " x " << bob.cols() << ":\n"
-	//           << bob << " |$| " << bob(0, 0) << " |$| " << bob.coeff(0, 0) << " |$| " << std::endl;
-	//
-	// Eigen::internal::BlockImpl_dense<Eigen::MatrixXd> robert(matt, 1, 2, 3, 4);
-	// std::cout << "robert: " << robert.rows() << " x " << robert.cols() << ":\n"
-	//           << robert << " |%| " << robert(0, 0) << " |%| " << robert.coeff(0, 0) << std::endl;
 
 
 	std::cout << "Tester terminated normally" << std::endl;
