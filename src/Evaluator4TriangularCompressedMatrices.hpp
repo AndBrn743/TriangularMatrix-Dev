@@ -452,8 +452,8 @@ namespace Eigen
 		};
 
 		template <typename MatrixType>
-		struct evaluator<Hoppy::PlainTriangularObjectBase<MatrixType>>
-		    : evaluator_base<Hoppy::PlainTriangularObjectBase<MatrixType>>
+		struct evaluator<Hoppy::PlainTriangularCompressedObjectBase<MatrixType>>
+		    : evaluator_base<Hoppy::PlainTriangularCompressedObjectBase<MatrixType>>
 		{
 			using Scalar = typename MatrixType::Scalar;
 			using CoeffReturnType = CoeffReturnProxy<const MatrixType>;
@@ -487,11 +487,11 @@ namespace Eigen
 #define CREARE_EVALUATOR_FOR_PALINTRIANGULAROBJECTBASE_BASED_CLASS(CLASS_NAME)                                         \
 	template <typename _Scalar, int... _Args>                                                                          \
 	struct evaluator<CLASS_NAME<_Scalar, _Args...>>                                                                    \
-	    : evaluator<PlainTriangularObjectBase<CLASS_NAME<_Scalar, _Args...>>>                                          \
+	    : evaluator<PlainTriangularCompressedObjectBase<CLASS_NAME<_Scalar, _Args...>>>                                \
 	{                                                                                                                  \
 	public:                                                                                                            \
 		using MatrixType = CLASS_NAME<_Scalar, _Args...>;                                                              \
-		using Base = evaluator<PlainTriangularObjectBase<MatrixType>>;                                                 \
+		using Base = evaluator<PlainTriangularCompressedObjectBase<MatrixType>>;                                       \
                                                                                                                        \
 		template <typename... Args2>                                                                                   \
 		explicit evaluator(Args2&&... args) : Base(std::forward<decltype(args)>(args)...)                              \
@@ -547,13 +547,15 @@ namespace Eigen
 
 		private:
 			template <bool KIsTriangularType = IsTriangularType>
-			[[nodiscard]] typename std::enable_if<KIsTriangularType, Scalar>::type Coeff_Impl(Index row, Index col) const
+			[[nodiscard]] typename std::enable_if<KIsTriangularType, Scalar>::type Coeff_Impl(Index row,
+			                                                                                  Index col) const
 			{
 				return CoeffReturnType{cr_object.Data(), row, col};
 			}
 
 			template <bool KIsTriangularType = IsTriangularType>
-			[[nodiscard]] typename std::enable_if<!KIsTriangularType, Scalar>::type Coeff_Impl(Index row, Index col) const
+			[[nodiscard]] typename std::enable_if<!KIsTriangularType, Scalar>::type Coeff_Impl(Index row,
+			                                                                                   Index col) const
 			{
 				return cr_object.Data()[row * cr_object.OuterStride() + col];
 			}
@@ -615,12 +617,12 @@ namespace Eigen
 	template <typename T>                                                                                              \
 	friend inline auto operator OPERATOR(const CoeffReturnProxyBase& lhs, const T& rhs)                                \
 	{                                                                                                                  \
-		return static_cast<Scalar>(lhs) OPERATOR rhs;                                                                              \
+		return static_cast<Scalar>(lhs) OPERATOR rhs;                                                                  \
 	}                                                                                                                  \
 	template <typename T>                                                                                              \
 	friend inline auto operator OPERATOR(const T& lhs, const CoeffReturnProxyBase& rhs)                                \
 	{                                                                                                                  \
-		return lhs OPERATOR static_cast<Scalar>(rhs);                                                                              \
+		return lhs OPERATOR static_cast<Scalar>(rhs);                                                                  \
 	}
 
 			CREATE_EVALUATION_OPERATORS(+)

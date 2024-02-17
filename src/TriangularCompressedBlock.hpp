@@ -4,7 +4,7 @@
 
 #pragma once
 #include "MapBase4TriangularCompressed.hpp"
-#include "TriangularMatrices.hpp"
+#include "TriangularCompressedMatrices.hpp"
 
 namespace Eigen
 {
@@ -12,10 +12,10 @@ namespace Eigen
 	{
 		template <typename XprType, int BlockRows, int BlockCols /*, bool InnerPanel = true*/>
 		class triangular_compressed_block_impl
-		    : public Hoppy::TriangularMatrixBase<Block<XprType, BlockRows, BlockCols>>
+		    : public Hoppy::TriangularCompressedMatrixBase<Block<XprType, BlockRows, BlockCols>>
 		{
 		public:
-			using Base = TriangularMatrixBase<Block<XprType, BlockRows, BlockCols>>;
+			using Base = TriangularCompressedMatrixBase<Block<XprType, BlockRows, BlockCols>>;
 			using Base::derived;
 			using Scalar = typename traits<XprType>::Scalar;
 			using NestedExpression = typename internal::remove_all<typename XprType::Nested>::type;

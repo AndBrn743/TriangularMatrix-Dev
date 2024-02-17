@@ -7,11 +7,11 @@
 namespace Hoppy
 {
 	template <typename Derived>
-	class MapBase4TriangularCompressed : public TriangularMatrixBase<Derived>
+	class MapBase4TriangularCompressed : public TriangularCompressedMatrixBase<Derived>
 	{
 	public:
 		using Scalar = typename Eigen::internal::traits<Derived>::Scalar;
-		using Base = TriangularMatrixBase<Derived>;
+		using Base = TriangularCompressedMatrixBase<Derived>;
 		using Base::FillWith;
 		using Base::IsShapeAs;
 		using Base::ResizeAs;

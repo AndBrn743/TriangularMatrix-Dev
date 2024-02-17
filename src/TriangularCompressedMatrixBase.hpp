@@ -5,18 +5,18 @@
 #pragma once
 
 #include "MathExt.hpp"
-#include "TriangularMatrices.hpp"
+#include "TriangularCompressedMatrices.hpp"
 #include <Eigen/Dense>
 #include <Eigen/Eigen>
 
 namespace Hoppy
 {
 	template <typename Derived>
-	class TriangularMatrixBase : public TriangularBase<Derived>
+	class TriangularCompressedMatrixBase : public TriangularCompressedBase<Derived>
 	{
 	public:
 		using Scalar = typename Eigen::internal::traits<Derived>::Scalar;
-		using Base = TriangularBase<Derived>;
+		using Base = TriangularCompressedBase<Derived>;
 		using Base::derived;
 		using Base::FillWith;
 		using Base::IsShapeAs;
@@ -30,21 +30,21 @@ namespace Hoppy
 
 		template <typename OtherDerived>
 		friend Eigen::Product<Derived, OtherDerived, Eigen::AliasFreeProduct> operator*(
-		        const TriangularMatrixBase& lhs, const Eigen::EigenBase<OtherDerived>& rhs)
+		        const TriangularCompressedMatrixBase& lhs, const Eigen::EigenBase<OtherDerived>& rhs)
 		{
 			return {lhs.derived(), rhs.derived()};
 		}
 
 		template <typename OtherDerived>
 		friend Eigen::Product<OtherDerived, Derived, Eigen::AliasFreeProduct> operator*(
-		        const Eigen::EigenBase<OtherDerived>& lhs, const TriangularMatrixBase& rhs)
+		        const Eigen::EigenBase<OtherDerived>& lhs, const TriangularCompressedMatrixBase& rhs)
 		{
 			return {lhs.derived(), rhs.derived()};
 		}
 
 		template <typename OtherDerived>
 		friend Eigen::Product<Derived, OtherDerived, Eigen::AliasFreeProduct> operator*(
-		        const TriangularMatrixBase& lhs, const TriangularMatrixBase<OtherDerived>& rhs)
+		        const TriangularCompressedMatrixBase& lhs, const TriangularCompressedMatrixBase<OtherDerived>& rhs)
 		{
 			return {lhs.derived(), rhs.derived()};
 		}
@@ -130,7 +130,7 @@ namespace Hoppy
 
 	protected:
 		template <typename... Args>
-		explicit TriangularMatrixBase(Args&&...)
+		explicit TriangularCompressedMatrixBase(Args&&...)
 		{
 			/* NO CODE. Added only to treat invalid upcasting operation as compile error. */
 		}
@@ -198,7 +198,7 @@ namespace Eigen
 		template <typename Derived, typename XprKind>
 		struct generic_xpr_base<Derived, XprKind, Hoppy::TriangularCompressed>
 		{
-			typedef Hoppy::TriangularMatrixBase<Derived> type;
+			typedef Hoppy::TriangularCompressedMatrixBase<Derived> type;
 		};
 
 

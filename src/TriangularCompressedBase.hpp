@@ -3,15 +3,15 @@
 //
 
 #pragma once
-#include "TriangularMatrices.hpp"
+#include "TriangularCompressedMatrices.hpp"
 
 namespace Hoppy
 {
 	template <typename Derived>
-	class TriangularBase : public TriangularCoeffsBase<Derived, Eigen::internal::accessors_level<Derived>::value>
+	class TriangularCompressedBase : public TriangularCompressedCoeffsBase<Derived, Eigen::internal::accessors_level<Derived>::value>
 	{
 	public:
-		using Base = TriangularCoeffsBase<Derived, Eigen::internal::accessors_level<Derived>::value>;
+		using Base = TriangularCompressedCoeffsBase<Derived, Eigen::internal::accessors_level<Derived>::value>;
 		using Scalar = typename Eigen::internal::traits<Derived>::Scalar;
 		using RealScalar = typename Eigen::NumTraits<Scalar>::Real;
 		using Base::cols;
@@ -19,7 +19,7 @@ namespace Hoppy
 		using Base::rows;
 		using Base::size;
 		using Base::operator();
-		using Nested = const TriangularBase&;
+		using Nested = const TriangularCompressedBase&;
 
 		static constexpr int Flags = Eigen::internal::traits<Derived>::Flags;
 		static constexpr int SizeAtCompileTime =
@@ -48,7 +48,7 @@ namespace Hoppy
 			return static_cast<typename Eigen::internal::eval<Derived>::type>(derived());
 		}
 
-		friend std::ostream& operator<<(std::ostream& s, const TriangularBase& m)
+		friend std::ostream& operator<<(std::ostream& s, const TriangularCompressedBase& m)
 		{
 			return Eigen::internal::print_matrix(s, m.eval(), EIGEN_DEFAULT_IO_FORMAT);
 		}
@@ -267,7 +267,7 @@ namespace Hoppy
 
 	protected:
 		template <typename... Args>
-		explicit TriangularBase(Args&&...)
+		explicit TriangularCompressedBase(Args&&...)
 		{
 			/* NO CODE. Added only to treat invalid upcasting operation as compile error. */
 		}

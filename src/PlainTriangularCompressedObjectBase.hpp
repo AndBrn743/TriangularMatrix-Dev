@@ -9,30 +9,30 @@
 namespace Hoppy
 {
 	template <typename Derived>
-	class PlainTriangularObjectBase : public TriangularMatrixBase<Derived>
+	class PlainTriangularCompressedObjectBase : public TriangularCompressedMatrixBase<Derived>
 	{
 	public:
 		using Scalar = typename Eigen::internal::traits<Derived>::Scalar;
-		using Base = TriangularMatrixBase<Derived>;
+		using Base = TriangularCompressedMatrixBase<Derived>;
 		using Base::FillWith;
 		using Base::IsShapeAs;
 		using Base::ResizeAs;
 		using Base::operator();
 		using Base::operator=;
-		typedef const PlainTriangularObjectBase& Nested;
+		typedef const PlainTriangularCompressedObjectBase& Nested;
 		static constexpr int DimensionAtCompileTime = Eigen::internal::traits<Derived>::DimensionAtCompileTime;
 
 
 	public:
-		PlainTriangularObjectBase() = default;
+		PlainTriangularCompressedObjectBase() = default;
 
-		explicit PlainTriangularObjectBase(const Eigen::Index dimension)
+		explicit PlainTriangularCompressedObjectBase(const Eigen::Index dimension)
 		{
 			Resize(dimension);
 			InitalizeMatrixElementsAccordingToMacro();
 		}
 
-		explicit PlainTriangularObjectBase(const Eigen::Index rowCount, const Eigen::Index columnCount)
+		explicit PlainTriangularCompressedObjectBase(const Eigen::Index rowCount, const Eigen::Index columnCount)
 		    : m_storage(RequiredBufferSizeOf(rowCount, columnCount), RequiredBufferSizeOf(rowCount, columnCount), 1),
 		      m_dimension(rowCount)
 		{
@@ -41,14 +41,14 @@ namespace Hoppy
 		}
 
 		template <typename OtherDerived>
-		explicit PlainTriangularObjectBase(const Eigen::MatrixBase<OtherDerived>& other)
+		explicit PlainTriangularCompressedObjectBase(const Eigen::MatrixBase<OtherDerived>& other)
 		{
 			ResizeAs(other);
 			FillWith([&other](Eigen::Index i, Eigen::Index j) -> Scalar { return other(i, j); });
 		}
 
 		template <typename OtherDerived>
-		explicit PlainTriangularObjectBase(const Eigen::EigenBase<OtherDerived>& other)
+		explicit PlainTriangularCompressedObjectBase(const Eigen::EigenBase<OtherDerived>& other)
 		{
 			ResizeAs(other);
 			const Eigen::MatrixX<typename Eigen::internal::traits<OtherDerived>::Scalar> temp = other;

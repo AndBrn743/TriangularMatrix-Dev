@@ -49,10 +49,11 @@ namespace Eigen
 	namespace Hoppy                                                                                                    \
 	{                                                                                                                  \
 		template <typename _Scalar, int _DimensionAtCompileTime, int _Option>                                          \
-		class CLASS_NAME : public PlainTriangularObjectBase<CLASS_NAME<_Scalar, _DimensionAtCompileTime, _Option>>     \
+		class CLASS_NAME                                                                                               \
+		    : public PlainTriangularCompressedObjectBase<CLASS_NAME<_Scalar, _DimensionAtCompileTime, _Option>>        \
 		{                                                                                                              \
 		public:                                                                                                        \
-			using Base = PlainTriangularObjectBase<CLASS_NAME<_Scalar, _DimensionAtCompileTime, _Option>>;             \
+			using Base = PlainTriangularCompressedObjectBase<CLASS_NAME<_Scalar, _DimensionAtCompileTime, _Option>>;   \
 			typedef const CLASS_NAME<_Scalar, _DimensionAtCompileTime, _Option>& Nested;                               \
 			typedef const CLASS_NAME<_Scalar, _DimensionAtCompileTime, _Option>& NestedExpression;                     \
                                                                                                                        \

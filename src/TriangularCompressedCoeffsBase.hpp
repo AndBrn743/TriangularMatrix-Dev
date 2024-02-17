@@ -7,7 +7,7 @@
 namespace Hoppy
 {
 	template <typename Derived, int Level>
-	class TriangularCoeffsBase : public Eigen::EigenBase<Derived>
+	class TriangularCompressedCoeffsBase : public Eigen::EigenBase<Derived>
 	{
 	public:
 		using Base = Eigen::EigenBase<Derived>;

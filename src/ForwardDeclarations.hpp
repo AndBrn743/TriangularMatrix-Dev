@@ -27,14 +27,14 @@ namespace Hoppy
 	class AntiHermitianMatrix;
 
 	template <typename Derived>
-	class PlainTriangularObjectBase;
+	class PlainTriangularCompressedObjectBase;
 
 	template <typename Derived>
-	class TriangularMatrixBase;
+	class TriangularCompressedMatrixBase;
 
 	template <typename Derived>
-	class TriangularBase;
+	class TriangularCompressedBase;
 
 	template <typename Derived, int Level>
-	class TriangularCoeffsBase;
+	class TriangularCompressedCoeffsBase;
 }  // namespace Hoppy
