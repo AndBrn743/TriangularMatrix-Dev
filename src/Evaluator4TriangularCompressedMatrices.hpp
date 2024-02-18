@@ -455,7 +455,7 @@ namespace Eigen
 		struct evaluator<Hoppy::PlainTriangularCompressedObjectBase<MatrixType>>
 		    : evaluator_base<Hoppy::PlainTriangularCompressedObjectBase<MatrixType>>
 		{
-			using Scalar = typename MatrixType::Scalar;
+			using Scalar = typename traits<MatrixType>::Scalar;
 			using CoeffReturnType = CoeffReturnProxy<const MatrixType>;
 			using RefCoeffReturnType = CoeffReturnProxy<MatrixType>;
 			static constexpr int CoeffReadCost = NumTraits<Scalar>::ReadCost;
