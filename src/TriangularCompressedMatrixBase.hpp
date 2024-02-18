@@ -107,6 +107,11 @@ namespace Hoppy
 			return *this;
 		}
 
+		static constexpr bool HasRealNumberMatrixElementsOnly()
+		{
+			return std::is_same<Scalar, typename Eigen::NumTraits<Scalar>::Real>::value;
+		}
+
 		static constexpr bool IsCompileTimeHermitian()
 		{
 			return std::is_same<
@@ -119,7 +124,22 @@ namespace Hoppy
 			                                SymmetricMatrix<Scalar,
 			                                                Eigen::internal::traits<Derived>::DimensionAtCompileTime,
 			                                                Eigen::internal::traits<Derived>::Option>>>::value
-			           && std::is_same<Scalar, decltype(Eigen::numext::real(Scalar(0)))>::value);
+			           && HasRealNumberMatrixElementsOnly());
+		}
+
+		static constexpr bool IsCompileTimeSymmetric()
+		{
+			return std::is_same<
+			               Eigen::EigenBase<Derived>,
+			               Eigen::EigenBase<SymmetricMatrix<Scalar,
+			                                                Eigen::internal::traits<Derived>::DimensionAtCompileTime,
+			                                                Eigen::internal::traits<Derived>::Option>>>::value
+			       || (std::is_same<Eigen::EigenBase<Derived>,
+			                        Eigen::EigenBase<
+			                                HermitianMatrix<Scalar,
+			                                                Eigen::internal::traits<Derived>::DimensionAtCompileTime,
+			                                                Eigen::internal::traits<Derived>::Option>>>::value
+			           && HasRealNumberMatrixElementsOnly());
 		}
 
 

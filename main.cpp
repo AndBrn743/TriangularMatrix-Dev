@@ -133,6 +133,24 @@ int main()
 	hermi = mark;
 	std::cout << "hermi <- mark:\n" << hermi << std::endl;
 
+	hermi.FillWithRandom();
+
+	std::cout << ">> " << TypeName<Eigen::internal::eval<Eigen::Transpose<decltype(matt)>>::type>() << std::endl;
+	std::cout << "matt.transpose():\n" << matt.transpose() << std::endl;
+	std::cout << "hermi(0, 0):\n" << hermi.coeff(0, 0) << std::endl;
+	std::cout << ">> " << TypeName<Eigen::internal::eval<Eigen::Transpose<decltype(hermi)>>::type>() << std::endl;
+	std::cout << ">>> " << TypeName<Eigen::internal::ref_selector<decltype(hermi)>::non_const_type>() << std::endl;
+	std::cout << ">>> " << TypeName<decltype(hermi)&>() << std::endl;
+
+	std::cout << "decltype(matt.transpose()): " << TypeName<decltype(matt.transpose())>() << std::endl;
+	std::cout << "decltype(hermi.Transpose()): " << TypeName<decltype(hermi.transpose())>() << std::endl;
+	Eigen::Transpose<decltype(hermi)> ht3(hermi);
+	std::cout << "ht3.nestedExpression() is " << ht3.nestedExpression().rows() << " x " << ht3.nestedExpression().cols()
+	          << std::endl;
+	std::cout << "ht3.nestedExpression():\n" << ht3.nestedExpression() << std::endl;
+	std::cout << "hermi.Transpose3()(0, 0):\n" << ht3.coeff(0, 0) << std::endl;
+	std::cout << "hermi.Transpose3():\n" << ht3.rows() << " x " << ht3.cols() << ":\n" << ht3 << std::endl;
+
 	try
 	{
 		hermi = manny;
