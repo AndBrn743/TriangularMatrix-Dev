@@ -550,26 +550,26 @@ namespace Eigen
 			[[nodiscard]] typename std::enable_if<KIsTriangularType, Scalar>::type Coeff_Impl(Index row,
 			                                                                                  Index col) const
 			{
-				return CoeffReturnType{cr_object.Data(), row, col};
+				return CoeffReturnType{cr_object.data(), row, col};
 			}
 
 			template <bool KIsTriangularType = IsTriangularType>
 			[[nodiscard]] typename std::enable_if<!KIsTriangularType, Scalar>::type Coeff_Impl(Index row,
 			                                                                                   Index col) const
 			{
-				return cr_object.Data()[row * cr_object.OuterStride() + col];
+				return cr_object.data()[row * cr_object.OuterStride() + col];
 			}
 
 			template <bool KIsTriangularType = IsTriangularType>
 			typename std::enable_if<KIsTriangularType, RefCoeffReturnType>::type CoeffRef_Impl(Index row, Index col)
 			{
-				return RefCoeffReturnType{cr_object.Data(), row, col};
+				return RefCoeffReturnType{cr_object.data(), row, col};
 			}
 
 			template <bool KIsTriangularType = IsTriangularType>
 			typename std::enable_if<!KIsTriangularType, RefCoeffReturnType>::type CoeffRef_Impl(Index row, Index col)
 			{
-				return const_cast<Scalar*>(cr_object.Data())[row * cr_object.OuterStride() + col];
+				return const_cast<Scalar*>(cr_object.data())[row * cr_object.OuterStride() + col];
 			}
 
 		private:
@@ -592,7 +592,7 @@ namespace Eigen
 			}
 
 			CoeffReturnProxyBase(const MatrixType& matrix, const Index row, const Index column)
-			    : m_data(matrix.Data()), m_row(row), m_column(column)
+			    : m_data(matrix.data()), m_row(row), m_column(column)
 			{
 				/* NO CODE */
 			}

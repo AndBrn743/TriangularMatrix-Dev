@@ -52,12 +52,12 @@ namespace Hoppy
 			return m_dimension;
 		}
 
-		[[nodiscard]] const Scalar* Data() const
+		[[nodiscard]] const Scalar* data() const
 		{
 			return m_data;
 		}
 
-		Scalar* Data()
+		Scalar* data()
 		{
 			return m_data;
 		}

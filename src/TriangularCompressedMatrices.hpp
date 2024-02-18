@@ -76,7 +76,7 @@ namespace Eigen
 			using Base::rows;                                                                                          \
 			using Base::cols;                                                                                          \
 			using Base::size;                                                                                          \
-			using Base::Data;                                                                                          \
+			using Base::data;                                                                                          \
 			using Base::RequiredBufferSizeOf;                                                                          \
 		};                                                                                                             \
 	}                                                                                                                  \
