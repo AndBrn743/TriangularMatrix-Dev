@@ -57,6 +57,12 @@ namespace Eigen
 			typedef const CLASS_NAME<_Scalar, _DimensionAtCompileTime, _Option>& Nested;                               \
 			typedef const CLASS_NAME<_Scalar, _DimensionAtCompileTime, _Option>& NestedExpression;                     \
                                                                                                                        \
+			static constexpr int ColsAtCompileTime = _DimensionAtCompileTime;                                          \
+			static constexpr int RowsAtCompileTime = _DimensionAtCompileTime;                                          \
+			static constexpr int MaxColsAtCompileTime = _DimensionAtCompileTime;                                       \
+			static constexpr int MaxRowsAtCompileTime = _DimensionAtCompileTime;                                       \
+                                                                                                                       \
+                                                                                                                       \
 		public:                                                                                                        \
 			CLASS_NAME() = default;                                                                                    \
                                                                                                                        \
