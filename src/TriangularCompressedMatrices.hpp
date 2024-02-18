@@ -61,7 +61,7 @@ namespace Eigen
 			CLASS_NAME() = default;                                                                                    \
                                                                                                                        \
 			template <typename... Args>                                                                                \
-			explicit CLASS_NAME(Args... args) : Base(args...)                                                          \
+			explicit CLASS_NAME(Args&&... args) : Base(std::forward<decltype(args)>(args)...)                          \
 			{                                                                                                          \
 				/* NO CODE*/                                                                                           \
 			}                                                                                                          \
