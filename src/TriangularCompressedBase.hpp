@@ -5,10 +5,67 @@
 #pragma once
 #include "TriangularCompressedMatrices.hpp"
 
+
+namespace Eigen
+{
+	template <typename MatrixType>
+	class TransposeImpl<MatrixType, Hoppy::TriangularCompressed>
+	    : public Hoppy::TriangularCompressedBase<Transpose<MatrixType>>
+	{
+	public:
+		typedef Hoppy::TriangularCompressedBase<Transpose<MatrixType>> Base;
+		using Base::coeff;
+		using Base::coeffRef;
+		using Base::derived;
+		using Scalar = typename Base::Scalar;
+		// EIGEN_DENSE_PUBLIC_INTERFACE(Transpose<MatrixType>)
+		EIGEN_INHERIT_ASSIGNMENT_OPERATORS(TransposeImpl)
+
+		Index innerStride() const
+		{
+			return derived().nestedExpression().innerStride();
+		}
+
+		Index outerStride() const
+		{
+			return derived().nestedExpression().outerStride();
+		}
+
+		typedef std::conditional_t<internal::is_lvalue<MatrixType>::value, Scalar, const Scalar>
+		        ScalarWithConstIfNotLvalue;
+
+		ScalarWithConstIfNotLvalue* data()
+		{
+			return derived().nestedExpression().data();
+		}
+
+		const Scalar* data() const noexcept
+		{
+			return derived().nestedExpression().data();
+		}
+
+		auto coeff(const Index i, const Index j) const noexcept
+		{
+			return derived().nestedExpression().coeff(j, i);
+		}
+
+		auto coeffRef(const Index rowId, const Index colId) noexcept
+		{
+			return derived().nestedExpression().coeffRef(colId, rowId);
+		}
+
+	protected:
+		EIGEN_DEFAULT_EMPTY_CONSTRUCTOR_AND_DESTRUCTOR(TransposeImpl)
+	};
+
+}  // namespace Eigen
+
+
 namespace Hoppy
 {
 	template <typename Derived>
-	class TriangularCompressedBase : public TriangularCompressedCoeffsBase<Derived, Eigen::internal::accessors_level<Derived>::value>
+	class TriangularCompressedBase
+	    : public TriangularCompressedCoeffsBase<Derived, Eigen::internal::accessors_level<Derived>::value>
 	{
 	public:
 		using Base = TriangularCompressedCoeffsBase<Derived, Eigen::internal::accessors_level<Derived>::value>;
@@ -20,6 +77,7 @@ namespace Hoppy
 		using Base::size;
 		using Base::operator();
 		using Nested = const TriangularCompressedBase&;
+		using CoeffReturnType = Scalar;
 
 		static constexpr int Flags = Eigen::internal::traits<Derived>::Flags;
 		static constexpr int SizeAtCompileTime =
@@ -262,6 +320,11 @@ namespace Hoppy
 		void ResizeAs(const Eigen::EigenBase<OtherDerived>& other)
 		{
 			derived().Resize(other.rows(), other.cols());
+		}
+
+		Eigen::Transpose<Derived> transpose()
+		{
+			return Eigen::Transpose<Derived>(derived());
 		}
 
 

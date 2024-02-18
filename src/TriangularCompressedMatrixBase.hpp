@@ -221,3 +221,30 @@ namespace Eigen
 
 	}  // namespace internal
 }  // namespace Eigen
+
+
+namespace Eigen
+{
+	namespace internal
+	{
+		template <typename T>
+		struct eval<Transpose<T>, Hoppy::TriangularCompressed>
+		{
+			using type = T;
+		};
+
+		template <typename TScalar, int KDimensionAtCompileTime, int KOption>
+		struct eval<Transpose<Hoppy::UpperTriangularMatrix<TScalar, KDimensionAtCompileTime, KOption>>,
+		            Hoppy::TriangularCompressed>
+		{
+			using type = Hoppy::LowerTriangularMatrix<TScalar, KDimensionAtCompileTime, KOption>;
+		};
+
+		template <typename TScalar, int KDimensionAtCompileTime, int KOption>
+		struct eval<Transpose<Hoppy::LowerTriangularMatrix<TScalar, KDimensionAtCompileTime, KOption>>,
+		            Hoppy::TriangularCompressed>
+		{
+			using type = Hoppy::UpperTriangularMatrix<TScalar, KDimensionAtCompileTime, KOption>;
+		};
+	}  // namespace internal
+}  // namespace Eigen
