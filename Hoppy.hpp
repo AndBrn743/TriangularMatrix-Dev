@@ -15,3 +15,4 @@
 #include "src/MapBase4TriangularCompressed.hpp"
 #include "src/TriangularCompressedBlock.hpp"
 #include "src/Map.hpp"
+#include "src/Assign.hpp"
