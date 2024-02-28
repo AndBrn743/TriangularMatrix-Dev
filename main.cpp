@@ -167,6 +167,17 @@ int main()
 		std::cout << "Hit expected exception: " << e.what() << std::endl;
 	}
 
+	std::cout << TypeName<Eigen::internal::evaluator_traits<Hoppy::HermitianMatrix<double>>::Shape>() << std::endl;
+	std::cout << TypeName<Eigen::internal::AssignmentKind<
+	        Eigen::DenseShape,
+	        Eigen::internal::evaluator_traits<Hoppy::HermitianMatrix<double>>::Shape>::Kind>()
+	          << std::endl;
+
+	Eigen::MatrixXcd headingSouth(6, 9);
+	headingSouth = hermi;
+	std::cout << "headingSouth:\n" << headingSouth << std::endl;
+	std::cout << "static_cast<Eigen::MatrixXcd>(hermi):\n" << static_cast<Eigen::MatrixXcd>(hermi) << std::endl;
+
 
 	std::cout << "Tester terminated normally" << std::endl;
 }
