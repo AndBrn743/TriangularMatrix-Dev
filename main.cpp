@@ -73,23 +73,23 @@ int main()
 	std::cout << "sqrt:\n" << sqrt << std::endl;
 	std::cout << "sqrt * sqrt:\n" << sqrt * sqrt << std::endl;
 
-	Hoppy::LowerTriangularMatrix<double> lucky(6);
+	Hoppy::LowerTriangularMatrixXd lucky(6);
 	lucky.FillWithRandom();
 	std::cout << "lucky:\n" << lucky << std::endl;
 
 
 
 
-	Eigen::ArrayX<std::complex<double>> buffer = Eigen::ArrayX<std::complex<double>>::Random(128);
+	Eigen::ArrayXcd buffer = Eigen::ArrayXcd::Random(128);
 	std::cout << "BUFFER: " << buffer.transpose() << std::endl;
-	Hoppy::Map<Hoppy::HermitianMatrix<std::complex<double>>> mate(buffer.data(), 5);
+	Hoppy::Map<Hoppy::HermitianMatrixXcd> mate(buffer.data(), 5);
 	std::cout << "mate: (" << mate.rows() << " x " << mate.cols() << ")\n"
 	          << mate(0, 0) << "  " << mate(0, 1) << "\n"
 	          << mate(1, 0) << "  " << mate(1, 1) << std::endl;
 	mate(1, 2) = std::complex<double>(1, 2);
 	std::cout << "mate:\n" << mate << std::endl;
 
-	Eigen::internal::triangular_compressed_block_impl<Hoppy::HermitianMatrix<std::complex<double>, -1, 0>, -1, -1> bob(
+	Eigen::internal::triangular_compressed_block_impl<decltype(hermi), Eigen::Dynamic, Eigen::Dynamic> bob(
 	        hermi, 1, 2, 4, 3);
 
 	std::cout << TypeName<typename Eigen::internal::eval<

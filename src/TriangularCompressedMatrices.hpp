@@ -85,6 +85,14 @@ namespace Eigen
 			using Base::data;                                                                                          \
 			using Base::RequiredBufferSizeOf;                                                                          \
 		};                                                                                                             \
+                                                                                                                       \
+                                                                                                                       \
+		template <typename TScalar>                                                                                    \
+		using CLASS_NAME##X = CLASS_NAME<TScalar, Eigen::Dynamic>;                                                     \
+		using CLASS_NAME##Xd = CLASS_NAME##X<double>;                                                                  \
+		using CLASS_NAME##Xf = CLASS_NAME##X<float>;                                                                   \
+		using CLASS_NAME##Xcd = CLASS_NAME##X<std::complex<double>>;                                                   \
+		using CLASS_NAME##Xcf = CLASS_NAME##X<std::complex<float>>;                                                    \
 	}                                                                                                                  \
                                                                                                                        \
 	namespace Eigen                                                                                                    \
