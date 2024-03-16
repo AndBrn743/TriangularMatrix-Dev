@@ -232,6 +232,34 @@ TEST_CASE("basic", "[BAISC TESTS]")
 		CHECK(hermi.size() == 9 * 9);
 	}
 
+	SECTION("Matrix Multiplication Test")
+	{
+		Eigen::MatrixXcd dennis = hermi;
+		Eigen::MatrixXcd left = Eigen::MatrixXcd::Random(10, dimension);
+		Eigen::MatrixXcd right = Eigen::MatrixXcd::Random(dimension, 12);
+		Eigen::MatrixXcd lm0 = left * dennis;
+		Eigen::MatrixXcd rm0 = dennis * right;
+
+		Eigen::MatrixXcd lm1 = left * hermi;
+		Eigen::MatrixXcd rm1 = hermi * right;
+		CHECK(std::abs((lm0 - lm1).trace()) < 1e-12);
+		CHECK(std::abs((rm0 - rm1).trace()) < 1e-12);
+
+		std::cout << "-left * hermi:\n" << -left * hermi << std::endl;
+		std::cout << "-hermi * right:\n" << -hermi * right << std::endl;
+		Eigen::MatrixXcd nlm1 = -left * hermi;
+		Eigen::MatrixXcd nrm1 = -hermi * right;
+		CHECK(std::abs((lm0 + nlm1).trace()) < 1e-12);
+		CHECK(std::abs((rm0 + nrm1).trace()) < 1e-12);
+
+		Eigen::MatrixXcd square0 = dennis * dennis;
+		Eigen::MatrixXcd square1 = hermi * hermi;
+		std::cout << "-hermi * hermi:\n" << -hermi * hermi << std::endl;
+		Eigen::MatrixXcd nsquare1 = -hermi * hermi;
+		CHECK(std::abs((square0 - square1).trace()) < 1e-12);
+		CHECK(std::abs((square0 + nsquare1).trace()) < 1e-12);
+	}
+
 	SECTION("Calculate Inverse")
 	{
 		Eigen::MatrixXcd inverse0 = hermi.ToFullMatrix().inverse();
