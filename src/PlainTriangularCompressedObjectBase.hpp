@@ -73,6 +73,16 @@ namespace Hoppy
 			}
 		}
 
+
+		void ConservativeResize(const Eigen::Index dimension)
+		{
+			if (dimension != m_dimension)
+			{
+				m_storage.conservativeResize(RequiredBufferSizeOf(dimension), RequiredBufferSizeOf(dimension), 1);
+				m_dimension.setValue(dimension);
+			}
+		}
+
 		void Resize(const Eigen::Index rowCount, const Eigen::Index columnCount)
 		{
 			if (rowCount != columnCount)

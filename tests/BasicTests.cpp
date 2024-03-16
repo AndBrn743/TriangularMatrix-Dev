@@ -188,6 +188,42 @@ TEST_CASE("basic", "[BAISC TESTS]")
 		}
 	}
 
+	SECTION("Conservative Resize (UP) Test")
+	{
+		REQUIRE(hermi.Dimension() < 12);
+		Eigen::MatrixXcd danny = hermi;
+		hermi.ConservativeResize(12);
+		CHECK(hermi.rows() == 12);
+		CHECK(hermi.cols() == 12);
+		CHECK(hermi.size() == 12 * 12);
+
+		for (int i = 0; i < danny.rows(); i++)
+		{
+			for (int j = 0; j < danny.cols(); j++)
+			{
+				CHECK(std::abs(hermi(i, j) - danny(i, j)) < 1e-12);
+			}
+		}
+	}
+
+	SECTION("Conservative Resize (DOWN) Test")
+	{
+		REQUIRE(hermi.Dimension() > 4);
+		Eigen::MatrixXcd danny = hermi;
+		hermi.ConservativeResize(4);
+		CHECK(hermi.rows() == 4);
+		CHECK(hermi.cols() == 4);
+		CHECK(hermi.size() == 4 * 4);
+
+		for (int i = 0; i < hermi.rows(); i++)
+		{
+			for (int j = 0; j < hermi.cols(); j++)
+			{
+				CHECK(std::abs(hermi(i, j) - danny(i, j)) < 1e-12);
+			}
+		}
+	}
+
 	SECTION("Resize Test")
 	{
 		hermi.Resize(9);
