@@ -92,12 +92,19 @@ int main()
 	Eigen::internal::triangular_compressed_block_impl<decltype(hermi), Eigen::Dynamic, Eigen::Dynamic> bob(
 	        hermi, 1, 2, 4, 3);
 
-	std::cout << TypeName<typename Eigen::internal::eval<
-	        Eigen::Block<Hoppy::HermitianMatrix<std::complex<double>, -1, 0>, -1, -1, false>>::type>()
-	          << std::endl;
+	std::cout << TypeName<Eigen::internal::eval<Eigen::Block<Hoppy::HermitianMatrixXcd>>::type>() << std::endl;
+	std::cout << TypeName<Eigen::internal::eval<Eigen::Block<Eigen::MatrixXcd>>::type>() << std::endl;
+
+	Eigen::MatrixXcd bevo = bob.ToFullMatrix();
+	std::cout << "bevo:\n" << bevo << std::endl;
+
+	std::cout << TypeName<Eigen::Block<decltype(bevo)>::PointerType>() << std::endl;
+	std::cout << TypeName<Eigen::Block<decltype(bevo)>::PointerType>() << std::endl;
+
 
 	std::cout << "bob: " << bob.rows() << " x " << bob.cols() << ":\n"
 	          << bob                         //
+	          // << static_cast<Eigen::MatrixXcd>(bob)                         // Error
 	          << " |$| " << bob(0, 0)        //
 	          << " |$| " << bob.coeff(0, 0)  //
 	          << std::endl;
@@ -118,12 +125,11 @@ int main()
 	std::cout << TypeName<Eigen::internal::eval<
 	        Eigen::Product<Hoppy::HermitianMatrix<double>, Hoppy::HermitianMatrix<double>>>::type>()
 	          << std::endl;
-	std::cout << TypeName<Eigen::internal::eval<Eigen::Product<Hoppy::HermitianMatrix<std::complex<double>>,
-	                                                           Hoppy::HermitianMatrix<std::complex<double>>>>::type>()
+	std::cout << TypeName<
+	        Eigen::internal::eval<Eigen::Product<Hoppy::HermitianMatrixXcd, Hoppy::HermitianMatrixXcd>>::type>()
 	          << std::endl;
-	std::cout << TypeName<Eigen::internal::eval<Eigen::Product<Hoppy::HermitianMatrix<std::complex<double>, -1, 0>,
-	                                                           Hoppy::HermitianMatrix<std::complex<double>, -1, 0>,
-	                                                           0>>::type>()
+	std::cout << TypeName<
+	        Eigen::internal::eval<Eigen::Product<Hoppy::HermitianMatrixXcd, Hoppy::HermitianMatrixXcd, 0>>::type>()
 	          << std::endl;
 
 	hermi = matt;
@@ -150,6 +156,16 @@ int main()
 	std::cout << "ht3.nestedExpression():\n" << ht3.nestedExpression() << std::endl;
 	std::cout << "hermi.Transpose3()(0, 0):\n" << ht3.coeff(0, 0) << std::endl;
 	std::cout << "hermi.Transpose3():\n" << ht3.rows() << " x " << ht3.cols() << ":\n" << ht3 << std::endl;
+
+	std::cout << matt.conjugate() << std::endl;
+	std::cout << "hermi.conjugate().coeff(0, 0) = " << hermi.conjugate().coeff(0, 0) << std::endl;
+	std::cout << "hermi.conjugate().coeff(0, 1) = " << hermi.conjugate().coeff(0, 1) << std::endl;
+	std::cout << "hermi.conjugate().coeff(1, 0) = " << hermi.conjugate().coeff(1, 0) << std::endl;
+	std::cout << "hermi.conjugate().coeff(1, 1) = " << hermi.conjugate().coeff(1, 1) << std::endl;
+	std::cout << TypeName<decltype(hermi.conjugate())>() << std::endl;
+	std::cout << TypeName<Eigen::internal::eval<decltype(hermi.conjugate())>::type>() << std::endl;
+	// std::cout << "hermi.conjugate().eval().coeff(1, 1) = " << hermi.conjugate().eval().coeff(1, 1) << std::endl;
+
 
 	try
 	{
@@ -178,6 +194,10 @@ int main()
 	std::cout << "headingSouth:\n" << headingSouth << std::endl;
 	std::cout << "static_cast<Eigen::MatrixXcd>(hermi):\n" << static_cast<Eigen::MatrixXcd>(hermi) << std::endl;
 
+	std::cout << TypeName<Eigen::internal::traits<decltype(hermi)>::StorageKind>() << std::endl;
+	// std::cout << TypeName<Eigen::internal::traits<decltype(bob)>::StorageKind>() << std::endl;
+	// std::cout << TypeName<Eigen::internal::evaluator_traits<decltype(bob)>::Shape>() << std::endl;
+	// headingSouth = bob;
 
 	std::cout << "Tester terminated normally" << std::endl;
 }
