@@ -47,6 +47,11 @@ namespace Hoppy
 			return m_dimension;
 		}
 
+		[[nodiscard]] Eigen::Index size() const
+		{
+			return rows() * cols();
+		}
+
 		[[nodiscard]] Eigen::Index Dimension() const
 		{
 			return m_dimension;
