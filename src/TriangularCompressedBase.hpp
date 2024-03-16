@@ -283,23 +283,28 @@ namespace Hoppy
 			return IndependentCwiseOp([this, &s](Eigen::Index i, Eigen::Index j) { (*this)(i, j) /= s; });
 		}
 
-		Eigen::MatrixX<Scalar> ToFullMatrix() const
+		Eigen::Matrix<Scalar, DimensionAtCompileTime, DimensionAtCompileTime> ToFullMatrix() const
 		{
-			Eigen::MatrixX<Scalar> result(derived().rows(), derived().cols());
+			Eigen::Matrix<Scalar, DimensionAtCompileTime, DimensionAtCompileTime> result(derived().rows(),
+			                                                                             derived().cols());
 			CwiseOp([&result, this](Eigen::Index i, Eigen::Index j) { result(i, j) = (*this)(i, j); });
 			return result;
 		}
 
-		Eigen::MatrixX<Scalar> ExtractLowerToFullMatrix() const
+		Eigen::Matrix<Scalar, DimensionAtCompileTime, DimensionAtCompileTime> ExtractLowerToFullMatrix() const
 		{
-			Eigen::MatrixX<Scalar> result = Eigen::MatrixX<Scalar>::Zero(derived().rows(), derived().cols());
+			Eigen::Matrix<Scalar, DimensionAtCompileTime, DimensionAtCompileTime> result =
+			        Eigen::Matrix<Scalar, DimensionAtCompileTime, DimensionAtCompileTime>::Zero(derived().rows(),
+			                                                                                    derived().cols());
 			LowerCwiseOp([&result, this](Eigen::Index i, Eigen::Index j) { result(i, j) = (*this)(i, j); });
 			return result;
 		}
 
-		Eigen::MatrixX<Scalar> ExtractUpperToFullMatrix() const
+		Eigen::Matrix<Scalar, DimensionAtCompileTime, DimensionAtCompileTime> ExtractUpperToFullMatrix() const
 		{
-			Eigen::MatrixX<Scalar> result = Eigen::MatrixX<Scalar>::Zero(derived().rows(), derived().cols());
+			Eigen::Matrix<Scalar, DimensionAtCompileTime, DimensionAtCompileTime> result =
+			        Eigen::Matrix<Scalar, DimensionAtCompileTime, DimensionAtCompileTime>::Zero(derived().rows(),
+			                                                                                    derived().cols());
 			UpperCwiseOp([&result, this](Eigen::Index i, Eigen::Index j) { result(i, j) = (*this)(i, j); });
 			return result;
 		}
