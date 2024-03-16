@@ -254,6 +254,24 @@ namespace Eigen
 		};
 
 		template <typename TScalar, int KDimensionAtCompileTime, int KOption>
+		struct eval<Transpose<Hoppy::HermitianMatrix<TScalar, KDimensionAtCompileTime, KOption>>,
+		            Hoppy::TriangularCompressed>
+		{
+		private:
+			using T = Hoppy::HermitianMatrix<TScalar, KDimensionAtCompileTime, KOption>;
+
+		public:
+			using type = typename std::conditional<NumTraits<TScalar>::IsComplex, T, const T&>::type;
+		};
+
+		template <typename TScalar, int KDimensionAtCompileTime, int KOption>
+		struct eval<Transpose<Hoppy::SymmetricMatrix<TScalar, KDimensionAtCompileTime, KOption>>,
+		            Hoppy::TriangularCompressed>
+		{
+			using type = const Hoppy::SymmetricMatrix<TScalar, KDimensionAtCompileTime, KOption>&;
+		};
+
+		template <typename TScalar, int KDimensionAtCompileTime, int KOption>
 		struct eval<Transpose<Hoppy::UpperTriangularMatrix<TScalar, KDimensionAtCompileTime, KOption>>,
 		            Hoppy::TriangularCompressed>
 		{
