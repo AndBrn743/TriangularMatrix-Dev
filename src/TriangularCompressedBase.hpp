@@ -121,12 +121,12 @@ namespace Hoppy
 	public:
 		Derived& FillWithOne()
 		{
-			return FillWith(1);
+			return FillWith(static_cast<Scalar>(1));
 		}
 
 		Derived& FillWithZero()
 		{
-			return FillWith(0);
+			return FillWith(static_cast<Scalar>(0));
 		}
 
 		Derived& FillWithNan()
