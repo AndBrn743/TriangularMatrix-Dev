@@ -232,6 +232,40 @@ TEST_CASE("basic", "[BAISC TESTS]")
 		CHECK(hermi.size() == 9 * 9);
 	}
 
+	SECTION("Calculate Inverse")
+	{
+		Eigen::MatrixXcd inverse0 = hermi.ToFullMatrix().inverse();
+		Eigen::MatrixXcd inverse1 = hermi.Inverse();
+		REQUIRE(inverse0.rows() == hermi.rows());
+		REQUIRE(inverse0.cols() == hermi.cols());
+		CHECK(inverse1.rows() == inverse0.rows());
+		CHECK(inverse1.cols() == inverse0.cols());
+
+		for (int i = 0; i < inverse0.rows(); i++)
+		{
+			for (int j = 0; j < inverse0.cols(); j++)
+			{
+				CHECK(std::abs(inverse0(i, j) - inverse1(i, j)) < 1e-12);
+			}
+		}
+
+		Eigen::MatrixXcd one = hermi * inverse1;
+		for (int i = 0; i < one.rows(); i++)
+		{
+			for (int j = 0; j < one.cols(); j++)
+			{
+				if (i != j)
+				{
+					CHECK(std::abs(one(i, j)) < 1e-12);
+				}
+				else
+				{
+					CHECK(std::abs(one(i, j) - 1.0) < 1e-12);
+				}
+			}
+		}
+	}
+
 	std::cout << hermi << std::endl;
 	std::cout << "=======================================================" << std::endl;
 }
