@@ -326,3 +326,43 @@ TEST_CASE("basic", "[BAISC TESTS]")
 	std::cout << hermi << std::endl;
 	std::cout << "=======================================================" << std::endl;
 }
+
+
+TEST_CASE("external memory", "[BASIC TESTS]")
+{
+	Eigen::ArrayXcd buffer = Eigen::ArrayXcd::Random(128);
+	std::cout << "BUFFER: " << buffer.transpose() << std::endl;
+
+	constexpr int dimension = 5;
+	Hoppy::Map<Hoppy::HermitianMatrixXcd> hermi(buffer.data(), dimension);
+
+	SECTION("Demsional Consistency")
+	{
+		CHECK(hermi.Dimension() == dimension);
+		CHECK(hermi.rows() == dimension);
+		CHECK(hermi.cols() == dimension);
+		CHECK(hermi.size() == dimension * dimension);
+	}
+	SECTION("Check If Data was Mapped Correctly")
+	{
+		double delta = 0;
+		for (int i = 0; i < dimension; i++)
+		{
+			for (int j = i; j < dimension; j++)
+			{
+				if (i != j)
+				{
+					delta += std::pow(std::abs(buffer.data()[Regin0(i, j)] - hermi(i, j)), 2);
+				}
+				else
+				{
+					delta += std::pow(std::abs(std::real(buffer.data()[Regin0(i, j)]) - hermi(i, j)), 2);
+				}
+			}
+		}
+		CHECK(std::sqrt(delta) < 1e-12);
+	}
+
+	std::cout << "mate, the matrix that was using external memory:\n" << hermi << std::endl;
+	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+}
