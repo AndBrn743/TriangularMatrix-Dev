@@ -266,6 +266,38 @@ TEST_CASE("basic", "[BAISC TESTS]")
 		}
 	}
 
+	SECTION("Calculate Matrix Sqrt")
+	{
+		Eigen::MatrixXcd sqrt = hermi.Sqrt<std::complex<double>>();
+		Eigen::MatrixXcd self = sqrt * sqrt;
+
+		for (int i = 0; i < dimension; i++)
+		{
+			for (int j = 0; j < dimension; j++)
+			{
+				CHECK(std::abs(hermi(i, j) - self(i, j)) < 1e-12);
+			}
+		}
+
+		Eigen::MatrixXcd one = sqrt * hermi.Inverse() * sqrt;
+		for (int i = 0; i < dimension; i++)
+		{
+			for (int j = 0; j < dimension; j++)
+			{
+				if (i == j)
+				{
+					CHECK(std::abs(one(i, j) - 1.0) < 1e-12);
+
+				}
+				else
+				{
+					CHECK(std::abs(one(i, j)) < 1e-12);
+				}
+			}
+		}
+	}
+
+
 	std::cout << hermi << std::endl;
 	std::cout << "=======================================================" << std::endl;
 }
