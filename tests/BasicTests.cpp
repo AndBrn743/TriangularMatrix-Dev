@@ -297,6 +297,72 @@ TEST_CASE("basic", "[BAISC TESTS]")
 		}
 	}
 
+	SECTION("Calculate Matrix Inverse Sqrt")
+	{
+		Eigen::MatrixXcd inverse0 = hermi.Inverse();
+		Eigen::MatrixXcd sqrt = hermi.Sqrt<std::complex<double>>();
+		Eigen::MatrixXcd inverseSqrt = hermi.InverseSqrt<std::complex<double>>();
+		Eigen::MatrixXcd inverse2 = inverseSqrt * inverseSqrt;
+
+		for (int i = 0; i < dimension; i++)
+		{
+			for (int j = 0; j < dimension; j++)
+			{
+				CHECK(std::abs(inverse0(i, j) - inverse2(i, j)) < 1e-12);
+			}
+		}
+
+		Eigen::MatrixXcd one = sqrt * inverseSqrt;
+		for (int i = 0; i < dimension; i++)
+		{
+			for (int j = 0; j < dimension; j++)
+			{
+				if (i == j)
+				{
+					CHECK(std::abs(one(i, j) - 1.0) < 1e-12);
+
+				}
+				else
+				{
+					CHECK(std::abs(one(i, j)) < 1e-12);
+				}
+			}
+		}
+
+		one = inverseSqrt * sqrt;
+		for (int i = 0; i < dimension; i++)
+		{
+			for (int j = 0; j < dimension; j++)
+			{
+				if (i == j)
+				{
+					CHECK(std::abs(one(i, j) - 1.0) < 1e-12);
+
+				}
+				else
+				{
+					CHECK(std::abs(one(i, j)) < 1e-12);
+				}
+			}
+		}
+
+		one = inverseSqrt * hermi * inverseSqrt;
+		for (int i = 0; i < dimension; i++)
+		{
+			for (int j = 0; j < dimension; j++)
+			{
+				if (i == j)
+				{
+					CHECK(std::abs(one(i, j) - 1.0) < 1e-12);
+
+				}
+				else
+				{
+					CHECK(std::abs(one(i, j)) < 1e-12);
+				}
+			}
+		}
+	}
 
 	std::cout << hermi << std::endl;
 	std::cout << "=======================================================" << std::endl;

@@ -66,13 +66,14 @@ namespace Hoppy
 			return vectors * values.asDiagonal() * vectors.conjugate().transpose();
 		}
 
-		Eigen::MatrixX<Scalar> InverseSqrt() const
+		template <typename OutScalar = Scalar>
+		Eigen::MatrixX<OutScalar> InverseSqrt() const  // TODO: make it return RealSymmetric for RealSymmetric case
 		{
 			StaticAssertForHermitians();
 
-			const Eigen::EigenSolver<decltype(ToFullMatrix())> solver(ToFullMatrix());
+			const Eigen::SelfAdjointEigenSolver<decltype(ToFullMatrix())> solver(ToFullMatrix());
 			const Eigen::MatrixX<Scalar>& vectors = solver.eigenvectors();
-			auto values = solver.eigenvalues();
+			Eigen::VectorX<OutScalar> values = solver.eigenvalues();
 			std::for_each(values.begin(), values.end(), [](auto& v) -> void { v = 1.0 / std::sqrt(v); });
 			return vectors * values.asDiagonal() * vectors.conjugate().transpose();
 		}
