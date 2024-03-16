@@ -104,6 +104,21 @@ namespace Eigen
 				return m_blockCols;
 			}
 
+			Matrix<Scalar, BlockRows, BlockCols> ToFullMatrix() const
+			{
+				Matrix<Scalar, BlockRows, BlockCols> result(rows(), cols());
+
+				for (Index i = 0; i < rows(); i++)
+				{
+					for (Index j = 0; j < cols(); j++)
+					{
+						result.coeffRef(i, j) = coeff(i, j);
+					}
+				}
+
+				return result;
+			}
+
 
 		protected:
 			typename internal::ref_selector<XprType>::non_const_type r_matrix;
@@ -114,10 +129,10 @@ namespace Eigen
 		};
 
 
-		template <>
-		struct eval<Block<Hoppy::HermitianMatrix<std::complex<double>, -1, 0>>>
+		template <typename T, int BlockRows, int BlockCols, int InnerPanel>
+		struct eval<Block<T, BlockRows, BlockCols, InnerPanel>, Hoppy::TriangularCompressed>
 		{
-			using type = Block<Hoppy::HermitianMatrix<std::complex<double>, -1, 0>>;
+			using type = const Block<T, BlockRows, BlockCols, InnerPanel>&;  // FIXME: should be Eigen::Matrix instead
 		};
 
 	}  // namespace internal
