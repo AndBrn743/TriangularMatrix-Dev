@@ -16,3 +16,4 @@ set(CMAKE_CXX_COMPILER_FLAGS "-Wall
                               -Wno-terminate")
 
 include_directories(${EIGEN3_INCLUDE_DIR})
+add_subdirectory(tests)
