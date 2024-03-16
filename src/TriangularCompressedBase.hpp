@@ -70,6 +70,7 @@ namespace Hoppy
 	public:
 		using Base = TriangularCompressedCoeffsBase<Derived, Eigen::internal::accessors_level<Derived>::value>;
 		using Scalar = typename Eigen::internal::traits<Derived>::Scalar;
+		static constexpr int DimensionAtCompileTime = Eigen::internal::traits<Derived>::DimensionAtCompileTime;
 		using RealScalar = typename Eigen::NumTraits<Scalar>::Real;
 		using Base::cols;
 		using Base::derived;
