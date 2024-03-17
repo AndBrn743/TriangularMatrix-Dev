@@ -40,23 +40,17 @@ namespace Hoppy
 			InitalizeMatrixElementsAccordingToMacro();
 		}
 
-		explicit PlainTriangularCompressedObjectBase(
-		        const Eigen::Transpose<typename Eigen::internal::eval<Derived>::type>& other)
-		{
-			// the transpose of my transpose is my-self
-			ResizeAs(other);
-			FillWith([&other](Eigen::Index i, Eigen::Index j) -> Scalar { return other(i, j); });
-		}
-
 		template <typename OtherDerived>
-		explicit PlainTriangularCompressedObjectBase(const Eigen::MatrixBase<OtherDerived>& other)
+		// NOLINTNEXTLINE(*-explicit-constructor)
+		/* IMPLICIT */ PlainTriangularCompressedObjectBase(const Eigen::MatrixBase<OtherDerived>& other)
 		{
 			ResizeAs(other);
 			FillWith([&other](Eigen::Index i, Eigen::Index j) -> Scalar { return other(i, j); });
 		}
 
 		template <typename OtherDerived>
-		explicit PlainTriangularCompressedObjectBase(const Eigen::EigenBase<OtherDerived>& other)
+		// NOLINTNEXTLINE(*-explicit-constructor)
+		/* IMPLICIT */ PlainTriangularCompressedObjectBase(const Eigen::EigenBase<OtherDerived>& other)
 		{
 			ResizeAs(other);
 			const Eigen::MatrixX<typename Eigen::internal::traits<OtherDerived>::Scalar> temp = other;

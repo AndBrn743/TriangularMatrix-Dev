@@ -72,6 +72,12 @@ namespace Eigen
 				/* NO CODE*/                                                                                           \
 			}                                                                                                          \
                                                                                                                        \
+			template <typename... OtherDerivedOnes> /* NOLINTNEXTLINE(*-explicit-constructor) */ /* IMPLICIT */        \
+			CLASS_NAME(Eigen::EigenBase<OtherDerivedOnes>&&... args) : Base(std::forward<decltype(args)>(args)...)     \
+			{                                                                                                          \
+				/* NO CODE*/                                                                                           \
+			}                                                                                                          \
+                                                                                                                       \
 			CLASS_NAME(const CLASS_NAME&) = default;                                                                   \
 			CLASS_NAME(CLASS_NAME&&) noexcept = default;                                                               \
 			CLASS_NAME& operator=(const CLASS_NAME&) = default;                                                        \
