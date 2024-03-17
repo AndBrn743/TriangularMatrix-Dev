@@ -323,6 +323,35 @@ TEST_CASE("basic", "[BAISC TESTS]")
 		CHECK(std::abs(zero.trace()) < 1e-12);
 	}
 
+	SECTION("Transpose Test")
+	{
+		const auto transposed0 = hermi.transpose();
+		Hoppy::HermitianMatrixXcd transposed1 = hermi.transpose();
+		Eigen::MatrixXcd transposed2 = hermi.transpose();
+
+		CHECK(transposed0.rows() == dimension);
+		CHECK(transposed0.cols() == dimension);
+		CHECK(transposed0.size() == dimension * dimension);
+		CHECK(transposed1.rows() == dimension);
+		CHECK(transposed1.cols() == dimension);
+		CHECK(transposed1.size() == dimension * dimension);
+		CHECK(transposed2.rows() == dimension);
+		CHECK(transposed2.cols() == dimension);
+		CHECK(transposed2.size() == dimension * dimension);
+
+		for (int i = 0; i < dimension; i++)
+		{
+			for (int j = 0; j < dimension; j++)
+			{
+				CHECK(std::abs(transposed0.coeff(i, j) - hermi.coeff(j, i).Get()) < 1e-12);
+				CHECK(std::abs(transposed1.coeff(i, j) - hermi.coeff(j, i).Get()) < 1e-12);
+				CHECK(std::abs(transposed2.coeff(i, j) - hermi.coeff(j, i).Get()) < 1e-12);
+			}
+		}
+
+		std::cout << "transposed0:\n" << transposed0 << std::endl;
+	}
+
 	std::cout << hermi << std::endl;
 	std::cout << "=======================================================" << std::endl;
 }
