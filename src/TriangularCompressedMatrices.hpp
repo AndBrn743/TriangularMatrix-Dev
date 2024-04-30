@@ -48,19 +48,20 @@ namespace Eigen
 #define CREATE_PLAINTRIANGULAROBJECTBASE_BASED_MATRIX_CLASS(CLASS_NAME)                                                \
 	namespace Hoppy                                                                                                    \
 	{                                                                                                                  \
-		template <typename _Scalar, int _DimensionAtCompileTime, int _Option>                                          \
+		template <typename TScalar, int KDimensionAtCompileTime, int KOptions>                                          \
 		class CLASS_NAME                                                                                               \
-		    : public PlainTriangularCompressedObjectBase<CLASS_NAME<_Scalar, _DimensionAtCompileTime, _Option>>        \
+		    : public PlainTriangularCompressedObjectBase<CLASS_NAME<TScalar, KDimensionAtCompileTime, KOptions>>        \
 		{                                                                                                              \
 		public:                                                                                                        \
-			using Base = PlainTriangularCompressedObjectBase<CLASS_NAME<_Scalar, _DimensionAtCompileTime, _Option>>;   \
-			typedef const CLASS_NAME<_Scalar, _DimensionAtCompileTime, _Option>& Nested;                               \
-			typedef const CLASS_NAME<_Scalar, _DimensionAtCompileTime, _Option>& NestedExpression;                     \
+			using Base = PlainTriangularCompressedObjectBase<CLASS_NAME<TScalar, KDimensionAtCompileTime, KOptions>>;   \
+			typedef const CLASS_NAME<TScalar, KDimensionAtCompileTime, KOptions>& Nested;                               \
+			typedef const CLASS_NAME<TScalar, KDimensionAtCompileTime, KOptions>& NestedExpression;                     \
                                                                                                                        \
-			static constexpr int ColsAtCompileTime = _DimensionAtCompileTime;                                          \
-			static constexpr int RowsAtCompileTime = _DimensionAtCompileTime;                                          \
-			static constexpr int MaxColsAtCompileTime = _DimensionAtCompileTime;                                       \
-			static constexpr int MaxRowsAtCompileTime = _DimensionAtCompileTime;                                       \
+			static constexpr int ColsAtCompileTime = KDimensionAtCompileTime;                                          \
+			static constexpr int RowsAtCompileTime = KDimensionAtCompileTime;                                          \
+			static constexpr int MaxColsAtCompileTime = KDimensionAtCompileTime;                                       \
+			static constexpr int MaxRowsAtCompileTime = KDimensionAtCompileTime;                                       \
+			static constexpr int Options = KOptions;                                                                    \
                                                                                                                        \
                                                                                                                        \
 		public:                                                                                                        \
