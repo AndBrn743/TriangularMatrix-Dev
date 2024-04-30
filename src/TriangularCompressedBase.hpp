@@ -144,13 +144,15 @@ namespace Hoppy
 			return FillWith([&](Eigen::Index, Eigen::Index) { return s; });
 		}
 
-		Derived& FillWith(const std::function<Scalar(Eigen::Index, Eigen::Index)>& functor)
+		template <typename Operation>
+		Derived& FillWith(const Operation& functor)
 		{
 			IndependentCwiseOp([this, &functor](Eigen::Index i, Eigen::Index j) { (*this)(i, j) = functor(i, j); });
 			return derived();
 		}
 
-		const Derived& CwiseOp(const std::function<void(Eigen::Index, Eigen::Index)>& functor)
+		template <typename Operation>
+		const Derived& CwiseOp(const Operation& functor)
 		{
 			for (Eigen::Index i = 0; i < rows(); i++)
 			{
@@ -163,7 +165,8 @@ namespace Hoppy
 			return derived();
 		}
 
-		const Derived& CwiseOp(const std::function<void(Eigen::Index, Eigen::Index)>& functor) const
+		template <typename Operation>
+		const Derived& CwiseOp(const Operation& functor) const
 		{
 			for (Eigen::Index i = 0; i < rows(); i++)
 			{
@@ -176,7 +179,8 @@ namespace Hoppy
 			return derived();
 		}
 
-		Derived& UpperCwiseOp(const std::function<void(Eigen::Index, Eigen::Index)>& functor)
+		template <typename Operation>
+		Derived& UpperCwiseOp(const Operation& functor)
 		{
 			for (Eigen::Index i = 0; i < rows(); i++)
 			{
@@ -189,7 +193,8 @@ namespace Hoppy
 			return derived();
 		}
 
-		Derived& LowerCwiseOp(const std::function<void(Eigen::Index, Eigen::Index)>& functor)
+		template <typename Operation>
+		Derived& LowerCwiseOp(const Operation& functor)
 		{
 			for (Eigen::Index i = 0; i < rows(); i++)
 			{
@@ -202,7 +207,36 @@ namespace Hoppy
 			return derived();
 		}
 
-		Derived& IndependentCwiseOp(const std::function<void(Eigen::Index, Eigen::Index)>& functor)
+		template <typename Operation>
+		const Derived& UpperCwiseOp(const Operation& functor) const
+		{
+			for (Eigen::Index i = 0; i < rows(); i++)
+			{
+				for (Eigen::Index j = i; j < cols(); j++)
+				{
+					functor(i, j);
+				}
+			}
+
+			return derived();
+		}
+
+		template <typename Operation>
+		const Derived& LowerCwiseOp(const Operation& functor) const
+		{
+			for (Eigen::Index i = 0; i < rows(); i++)
+			{
+				for (Eigen::Index j = 0; j <= i; j++)
+				{
+					functor(i, j);
+				}
+			}
+
+			return derived();
+		}
+
+		template <typename Operation>
+		Derived& IndependentCwiseOp(const Operation& functor)
 		{
 			if (Eigen::internal::traits<Derived>::IsUpperCritical)
 			{
