@@ -90,7 +90,8 @@ namespace Hoppy
 		static constexpr int MaxSizeAtCompileTime = SizeAtCompileTime;
 		static constexpr bool IsVectorAtCompileTime = Eigen::internal::traits<Derived>::RowsAtCompileTime == 1
 		                                              || Eigen::internal::traits<Derived>::ColsAtCompileTime == 1;
-		using PlainObject = Eigen::Matrix<typename Eigen::internal::traits<Derived>::Scalar,
+		using PlainObject = Derived;
+		using DenseObject = Eigen::Matrix<typename Eigen::internal::traits<Derived>::Scalar,
 		                                  Eigen::internal::traits<Derived>::RowsAtCompileTime,
 		                                  Eigen::internal::traits<Derived>::ColsAtCompileTime,
 		                                  Eigen::AutoAlign
@@ -317,7 +318,7 @@ namespace Hoppy
 			return IndependentCwiseOp([this, &s](Eigen::Index i, Eigen::Index j) { (*this)(i, j) /= s; });
 		}
 
-		Eigen::Matrix<Scalar, DimensionAtCompileTime, DimensionAtCompileTime> ToFullMatrix() const
+		DenseObject ToFullMatrix() const
 		{
 			Eigen::Matrix<Scalar, DimensionAtCompileTime, DimensionAtCompileTime> result(derived().rows(),
 			                                                                             derived().cols());
@@ -325,7 +326,7 @@ namespace Hoppy
 			return result;
 		}
 
-		Eigen::Matrix<Scalar, DimensionAtCompileTime, DimensionAtCompileTime> ExtractLowerToFullMatrix() const
+		DenseObject ExtractLowerToFullMatrix() const
 		{
 			Eigen::Matrix<Scalar, DimensionAtCompileTime, DimensionAtCompileTime> result =
 			        Eigen::Matrix<Scalar, DimensionAtCompileTime, DimensionAtCompileTime>::Zero(derived().rows(),
@@ -334,12 +335,10 @@ namespace Hoppy
 			return result;
 		}
 
-		Eigen::Matrix<Scalar, DimensionAtCompileTime, DimensionAtCompileTime> ExtractUpperToFullMatrix() const
+		DenseObject ExtractUpperToFullMatrix() const
 		{
-			Eigen::Matrix<Scalar, DimensionAtCompileTime, DimensionAtCompileTime> result =
-			        Eigen::Matrix<Scalar, DimensionAtCompileTime, DimensionAtCompileTime>::Zero(derived().rows(),
-			                                                                                    derived().cols());
-			UpperCwiseOp([&result, this](Eigen::Index i, Eigen::Index j) { result(i, j) = (*this)(i, j); });
+			DenseObject result = DenseObject::Zero(derived().rows(), derived().cols());
+			this->UpperCwiseOp([&result, this](Eigen::Index i, Eigen::Index j) { result(i, j) = (*this)(i, j); });
 			return result;
 		}
 

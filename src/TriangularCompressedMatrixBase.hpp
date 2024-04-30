@@ -9,6 +9,18 @@
 #include <Eigen/Dense>
 #include <Eigen/Eigen>
 
+namespace Eigen
+{
+	namespace internal
+	{
+		template <>
+		struct glue_shapes<Hoppy::TriangularCompressedShape, TriangularShape>
+		{
+			using type = TriangularShape;
+		};
+	}  // namespace internal
+}  // namespace Eigen
+
 namespace Hoppy
 {
 	template <typename Derived>
@@ -18,6 +30,8 @@ namespace Hoppy
 		using Scalar = typename Eigen::internal::traits<Derived>::Scalar;
 		using Base = TriangularCompressedBase<Derived>;
 		using Base::derived;
+		using Base::ExtractLowerToFullMatrix;
+		using Base::ExtractUpperToFullMatrix;
 		using Base::FillWith;
 		using Base::IsShapeAs;
 		using Base::ToFullMatrix;
@@ -26,6 +40,7 @@ namespace Hoppy
 
 		using CoeffReturnType = Scalar;
 		using PlainObject = typename Base::PlainObject;
+		using DenseObject = typename Base::DenseObject;
 
 
 		template <typename OtherDerived>
@@ -140,6 +155,36 @@ namespace Hoppy
 			                                                Eigen::internal::traits<Derived>::Option>>>::value
 			           && HasRealNumberMatrixElementsOnly());
 		}
+
+
+		using AdjointReturnType = typename Eigen::internal::traits<Derived>::AdjointType;
+		using TransposeReturnType = typename Eigen::internal::traits<Derived>::TransposeType;
+		using ConstTransposeReturnType = typename Eigen::internal::traits<const Derived>::TransposeType;
+
+		template <unsigned int Mode>
+		struct TriangularViewReturnType
+		{
+			using Type = Eigen::TriangularView<Derived, Mode>;
+		};
+
+		template <unsigned int Mode>
+		struct ConstTriangularViewReturnType
+		{
+			using Type = const Eigen::TriangularView<const Derived, Mode>;
+		};
+
+		template <unsigned int Mode>
+		EIGEN_DEVICE_FUNC typename TriangularViewReturnType<Mode>::Type triangularView()
+		{
+			return typename TriangularViewReturnType<Mode>::Type(derived());
+		}
+
+		template <unsigned int Mode>
+		EIGEN_DEVICE_FUNC typename ConstTriangularViewReturnType<Mode>::Type triangularView() const
+		{
+			return typename ConstTriangularViewReturnType<Mode>::Type(derived());
+		}
+
 
 
 		// TODO:

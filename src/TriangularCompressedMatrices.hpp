@@ -72,7 +72,8 @@ namespace Eigen
 				/* NO CODE*/                                                                                           \
 			}                                                                                                          \
                                                                                                                        \
-			template <typename... OtherDerivedOnes> /* NOLINTNEXTLINE(*-explicit-constructor) */ /* IMPLICIT */        \
+			template <typename... OtherDerivedOnes>                                                                    \
+			/* NOLINTNEXTLINE(*-explicit-constructor) */ /* IMPLICIT */                                                \
 			CLASS_NAME(Eigen::EigenBase<OtherDerivedOnes>&&... args) : Base(std::forward<decltype(args)>(args)...)     \
 			{                                                                                                          \
 				/* NO CODE*/                                                                                           \
@@ -134,32 +135,39 @@ namespace Eigen
 				static constexpr bool IsVectorAtCompileTime = KDimensionAtCompileTime == 1;                            \
 				static constexpr int Flags = DirectAccessBit | LvalueBit | NestByRefBit | RowMajorBit;                 \
 				using StorageKind = Hoppy::TriangularCompressed;                                                       \
+				static constexpr bool IsMatrixElementReal =                                                            \
+				        std::is_same<TScalar, typename Eigen::NumTraits<TScalar>::Real>::value;                        \
+				static constexpr bool IsSymmetric =                                                                    \
+				        std::is_same<Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>,                     \
+				                     Hoppy::SymmetricMatrix<TScalar, KDimensionAtCompileTime, KOption>>::value         \
+				        || (std::is_same<Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>,                 \
+				                         Hoppy::HermitianMatrix<TScalar, KDimensionAtCompileTime, KOption>>::value     \
+				            && IsMatrixElementReal);                                                                   \
+				static constexpr bool IsSelfAjoint =                                                                   \
+				        std::is_same<Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>,                     \
+				                     Hoppy::HermitianMatrix<TScalar, KDimensionAtCompileTime, KOption>>::value         \
+				        || (std::is_same<Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>,                 \
+				                         Hoppy::SymmetricMatrix<TScalar, KDimensionAtCompileTime, KOption>>::value     \
+				            && IsMatrixElementReal);                                                                   \
+				using TransposeType = typename std::conditional<                                                       \
+				        std::is_same<Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>,                     \
+				                     Hoppy::UpperTriangularMatrix<TScalar, KDimensionAtCompileTime, KOption>>::value,  \
+				        Hoppy::LowerTriangularMatrix<TScalar, KDimensionAtCompileTime, KOption>,                       \
+				        typename std::conditional<                                                                     \
+				                std::is_same<                                                                          \
+				                        Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>,                  \
+				                        Hoppy::LowerTriangularMatrix<TScalar, KDimensionAtCompileTime, KOption>>::     \
+				                        value,                                                                         \
+				                Hoppy::UpperTriangularMatrix<TScalar, KDimensionAtCompileTime, KOption>,               \
+				                Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>>::type>::type;            \
+				using AdjointType = TransposeType;                                                                     \
 			};                                                                                                         \
                                                                                                                        \
 			template <typename TScalar, int KDimensionAtCompileTime, int KOption>                                      \
 			struct traits<const Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>>                          \
+			    : traits<Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>>                                 \
 			{                                                                                                          \
-				using Scalar = const TScalar;                                                                          \
-				static constexpr int DimensionAtCompileTime = KDimensionAtCompileTime;                                 \
-				static constexpr int RowsAtCompileTime = KDimensionAtCompileTime;                                      \
-				static constexpr int ColsAtCompileTime = KDimensionAtCompileTime;                                      \
-				static constexpr int MaxRowsAtCompileTime = KDimensionAtCompileTime;                                   \
-				static constexpr int MaxColsAtCompileTime = KDimensionAtCompileTime;                                   \
-				static constexpr int SizeAtCompileTime =                                                               \
-				        KDimensionAtCompileTime != Dynamic ? KDimensionAtCompileTime : Dynamic;                        \
-				static constexpr int MaxSizeAtCompileTime = SizeAtCompileTime;                                         \
-				static constexpr int InnerStrideAtCompileTime = 1;                                                     \
-				static constexpr int OuterStrideAtCompileTime = Dynamic;                                               \
-				using XprKind = MatrixXpr;                                                                             \
-				using SpecificXprKind = CLASS_NAME##Xpr;                                                               \
-				using StorageIndex = Eigen::Index;                                                                     \
-				static constexpr int Option = KOption;                                                                 \
-				static constexpr bool IsUpperCritical =                                                                \
-				        std::is_same<Hoppy::CLASS_NAME<TScalar, KDimensionAtCompileTime, KOption>,                     \
-				                     Hoppy::UpperTriangularMatrix<TScalar, KDimensionAtCompileTime, KOption>>::value;  \
-				static constexpr bool IsVectorAtCompileTime = KDimensionAtCompileTime == 1;                            \
-				static constexpr int Flags = DirectAccessBit | LvalueBit | NestByRefBit | RowMajorBit;                 \
-				using StorageKind = Hoppy::TriangularCompressed;                                                       \
+				/* NO CODE */                                                                                          \
 			};                                                                                                         \
                                                                                                                        \
 			template <typename TScalar, int KDimensionAtCompileTime, int KOption>                                      \

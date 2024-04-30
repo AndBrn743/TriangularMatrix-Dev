@@ -16,3 +16,4 @@
 #include "src/TriangularCompressedBlock.hpp"
 #include "src/Map.hpp"
 #include "src/Assign.hpp"
+#include "src/TriangularView-Extension.hpp"
