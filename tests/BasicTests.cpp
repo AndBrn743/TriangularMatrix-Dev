@@ -12,7 +12,72 @@
 
 #include "../Hoppy.hpp"
 #include "../devtools/Tools.hpp"
-// #include "../src/NonresizableReturnType.hpp"
+#include "catch2/catch_approx.hpp"
+
+// #include "../src/TriangularView-Extension.hpp"
+
+// namespace Eigen
+// {
+// 	template <typename MatrixType>
+// 	// template <typename InputType>
+// 	template <>
+// 	EIGEN_DEVICE_FUNC SelfAdjointEigenSolver<MatrixType>&
+// 	// SelfAdjointEigenSolver<MatrixType>::compute(const Hoppy::TriangularCompressedCoeffsBase<InputType>& a_matrix, int
+// options) 	SelfAdjointEigenSolver<MatrixType>::compute(const Hoppy::HermitianMatrixXcd& a_matrix, int options)
+// 	{
+// 		check_template_parameters();
+//
+// 		// const InputType& matrix(a_matrix.derived());
+// 		const Hoppy::HermitianMatrixXcd& matrix(a_matrix.derived());
+//
+// 		EIGEN_USING_STD(abs);
+// 		eigen_assert(matrix.cols() == matrix.rows());
+// 		eigen_assert((options & ~(EigVecMask | GenEigMask)) == 0 && (options & EigVecMask) != EigVecMask
+// 		             && "invalid option parameter");
+// 		bool computeEigenvectors = (options & ComputeEigenvectors) == ComputeEigenvectors;
+// 		Index n = matrix.cols();
+// 		m_eivalues.resize(n, 1);
+//
+// 		if (n == 1)
+// 		{
+// 			m_eivec = matrix;
+// 			m_eivalues.coeffRef(0, 0) = numext::real(m_eivec.coeff(0, 0));
+// 			if (computeEigenvectors)
+// 			{
+// 				m_eivec.setOnes(n, n);
+// 			}
+// 			m_info = Success;
+// 			m_isInitialized = true;
+// 			m_eigenvectorsOk = computeEigenvectors;
+// 			return *this;
+// 		}
+//
+// 		// declare some aliases
+// 		RealVectorType& diag = m_eivalues;
+// 		EigenvectorsType& mat = m_eivec;
+//
+// 		// map the matrix coefficients to [-1:1] to avoid over- and underflow.
+// 		mat = matrix.template triangularView<Lower>();
+// 		RealScalar scale = mat.cwiseAbs().maxCoeff();
+// 		if (scale == RealScalar(0))
+// 		{
+// 			scale = RealScalar(1);
+// 		}
+// 		mat.template triangularView<Lower>() /= scale;
+// 		m_subdiag.resize(n - 1);
+// 		m_hcoeffs.resize(n - 1);
+// 		internal::tridiagonalization_inplace(mat, diag, m_subdiag, m_hcoeffs, computeEigenvectors);
+//
+// 		m_info = internal::computeFromTridiagonal_impl(diag, m_subdiag, m_maxIterations, computeEigenvectors, m_eivec);
+//
+// 		// scale back the eigen values
+// 		m_eivalues *= scale;
+//
+// 		m_isInitialized = true;
+// 		m_eigenvectorsOk = computeEigenvectors;
+// 		return *this;
+// 	}
+// }  // namespace Eigen
 
 
 TEST_CASE("basic", "[BAISC TESTS]")
@@ -260,6 +325,25 @@ TEST_CASE("basic", "[BAISC TESTS]")
 		CHECK(std::abs((square0 + nsquare1).trace()) < 1e-12);
 	}
 
+	SECTION("EVD Test")
+	{
+		Hoppy::HermitianMatrixXcd large(1000);
+		large.FillWithRandom();
+
+		const auto t0 = std::chrono::high_resolution_clock::now();
+		Eigen::SelfAdjointEigenSolver<Eigen::MatrixXcd> es0(large);
+		const auto t1 = std::chrono::high_resolution_clock::now();
+		Eigen::SelfAdjointEigenSolver<Eigen::MatrixXcd> es2(large.ToFullMatrix());
+		const auto t2 = std::chrono::high_resolution_clock::now();
+
+		CHECK((es0.eigenvalues() - es2.eigenvalues()).norm() == Catch::Approx(0));
+		CHECK((es0.eigenvectors() - es2.eigenvectors()).norm() == Catch::Approx(0));
+
+		std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << " ms" << std::endl;
+		std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " ms" << std::endl;
+		CHECK((t2 - t1).count() < (t1 - t0).count() * 1.1);
+	}
+
 	SECTION("Calculate Inverse")
 	{
 		Eigen::MatrixXcd inverse0 = hermi.ToFullMatrix().inverse();
@@ -394,4 +478,57 @@ TEST_CASE("external memory", "[BASIC TESTS]")
 
 	std::cout << "mate, the matrix that was using external memory:\n" << hermi << std::endl;
 	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+}
+
+
+#include "../src/NonResizableView.hpp"
+TEST_CASE("non-resizable view", "[BASIC TESTS]")
+{
+	Eigen::MatrixXd rectangular = Eigen::MatrixXd::Random(5, 7);
+	Eigen::MatrixXd square = Eigen::MatrixXd::Random(6, 6);
+
+	Eigen::NonResizableView<Eigen::MatrixXd> nrr(rectangular);
+	Eigen::NonResizableView<Eigen::MatrixXd> nrs(square);
+
+	SECTION("Assignment without resize")
+	{
+		const Eigen::MatrixXd newRectanglar = Eigen::MatrixXd::Random(rectangular.rows(), rectangular.cols());
+
+		nrr = newRectanglar;
+		CHECK((rectangular - newRectanglar).norm() == Catch::Approx(0));
+	}
+
+	SECTION("Assignment with resize")
+	{
+		SKIP();
+		nrs = nrr;
+	}
+
+	SECTION("Check that EVD still works")
+	{
+		const Eigen::EigenSolver<Eigen::MatrixXd> es1(square);
+		const Eigen::EigenSolver<Eigen::MatrixXd> es2(nrs);
+
+		CHECK((es1.eigenvectors() - es2.eigenvectors()).norm() == Catch::Approx(0));
+		CHECK((es1.eigenvalues() - es2.eigenvalues()).norm() == Catch::Approx(0));
+	}
+
+	SECTION("EVD proformace")
+	{
+		Eigen::MatrixXd matrix = Eigen::MatrixXd::Random(1000, 1000);
+		Eigen::NonResizableView<Eigen::MatrixXd> nrv(matrix);
+
+		matrix = matrix.transpose().eval();
+
+		const auto t0 = std::chrono::high_resolution_clock::now();
+		Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> saes1(matrix);
+		const auto t1 = std::chrono::high_resolution_clock::now();
+		Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> saes2(nrv);
+		const auto t2 = std::chrono::high_resolution_clock::now();
+
+		std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << " ms" << std::endl;
+		std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " ms" << std::endl;
+
+		CHECK((t2 - t1).count() < (t1 - t0).count() * 1.1);
+	}
 }
