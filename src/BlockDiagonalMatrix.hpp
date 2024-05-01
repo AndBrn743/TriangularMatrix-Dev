@@ -8,8 +8,17 @@
 
 namespace Hoppy
 {
+	template <typename Derived>
+	class BlockMatrixBase;
+
+	template <typename Derived>
+	class OneDimensionalBlockMatrixBase;
+
 	template <typename BlockType, template <typename TBlock, typename TAlloc> class BlockContainer>
 	class BlockDiagonalMatrix;
+
+	template <typename BlockType, template <typename TBlock, typename TAlloc> class BlockContainer>
+	class BlockVector;
 
 
 	namespace internal
@@ -129,145 +138,55 @@ namespace Hoppy
 				return Regin1<2>(triangularCompressed.rows());
 			}
 		}  // namespace BlockMatrix
+
+		template <typename T>
+		struct traits;
 	}  // namespace internal
 
 
-	template <typename BlockType,
-	          template <typename TBlock, typename TAlloc = std::allocator<TBlock>> class BlockContainer =
-	                  internal::BlockMatrix::DefaultBlockContainer>
-	class BlockDiagonalMatrix
+	template <typename Derived>
+	class BlockMatrixBase
 	{
-		static_assert(!(BlockType::RowsAtCompileTime == 1 && BlockType::ColsAtCompileTime == 1),
-		              "Compile time scalar object cannot be use as BlockDiagonalMatrix blocks");
-
 	public:
-		BlockDiagonalMatrix() = default;
-		BlockDiagonalMatrix(const BlockDiagonalMatrix&) = default;
-		BlockDiagonalMatrix(BlockDiagonalMatrix&&) noexcept = default;
-		BlockDiagonalMatrix& operator=(const BlockDiagonalMatrix&) = default;
-		BlockDiagonalMatrix& operator=(BlockDiagonalMatrix&&) noexcept = default;
+		using BlockType = typename internal::traits<Derived>::BlockType;
+		using Scalar = typename BlockType::Scalar;
+		using BlockContainer = typename internal::traits<Derived>::BlockContainer;
+		static bool constexpr IsVector = internal::traits<Derived>::IsVector;
+		static bool constexpr IsRowVector = internal::traits<Derived>::IsRowVector;
 
-		template <typename BlockSizeList>
-		explicit BlockDiagonalMatrix(const BlockSizeList& blockSizes)
+		Derived& AsDerived()
 		{
-			m_Blocks.reserve(blockSizes.size());
-
-			for (const auto size : blockSizes)
-			{
-				static_assert(std::is_integral<decltype(size)>::value, "Invalid block size list");
-				m_Blocks.emplace_back(internal::BlockMatrix::DiagonalBlockCreator<BlockType>::Create(size));
-			}
+			return *static_cast<Derived*>(this);
 		}
 
-		template <typename T>
-		BlockDiagonalMatrix(const std::initializer_list<T>& blockSizes)
+		const Derived& AsDerived() const
 		{
-			m_Blocks.reserve(blockSizes.size());
-
-			for (const auto size : blockSizes)
-			{
-				static_assert(std::is_integral<decltype(size)>::value, "Invalid block size list");
-				m_Blocks.emplace_back(internal::BlockMatrix::DiagonalBlockCreator<BlockType>::Create(size));
-			}
-		}
-
-		explicit BlockDiagonalMatrix(BlockType&& block)
-		{
-			m_Blocks.emplace_back(block);
-		}
-
-		explicit BlockDiagonalMatrix(const BlockType& block)
-		{
-			m_Blocks.emplace_back(block);
-		}
-
-		template <typename Derived>
-		explicit BlockDiagonalMatrix(Eigen::MatrixBase<Derived>&& block)
-		{
-			m_Blocks.emplace_back(block);
-		}
-
-		template <typename Derived>
-		explicit BlockDiagonalMatrix(const Eigen::MatrixBase<Derived>& block)
-		{
-			m_Blocks.emplace_back(block);
-		}
-
-		template <typename OtherBlockType, template <typename, typename> class OtherBlockContainer>
-		static BlockDiagonalMatrix PartitionedAs(const BlockDiagonalMatrix<OtherBlockType, OtherBlockContainer>& other)
-		{
-			BlockDiagonalMatrix result{};
-
-			result.m_Blocks.reserve(other.BlockCount());
-
-			for (const auto& b : other)
-			{
-				result.m_Blocks.emplace_back(internal::BlockMatrix::DiagonalBlockCreator<BlockType>::Create(
-				        internal::BlockMatrix::DimensionOf(b)));
-			}
-
-			return result;
+			return *static_cast<const Derived*>(this);
 		}
 
 		Eigen::NonResizableView<BlockType> operator[](const Eigen::Index blockIndex)
 		{
-			return Eigen::NonResizableView<BlockType>{m_Blocks[blockIndex]};
+			return Eigen::NonResizableView<BlockType>{Blocks()[blockIndex]};
 		}
 
 		Eigen::NonResizableView<const BlockType> operator[](const Eigen::Index blockIndex) const
 		{
-			return Eigen::NonResizableView<const BlockType>{m_Blocks[blockIndex]};
+			return Eigen::NonResizableView<const BlockType>{Blocks()[blockIndex]};
 		}
 
 		Eigen::Index BlockCount() const
 		{
-			return m_Blocks.size();
-		}
-
-		Eigen::Index TotalDimension() const
-		{
-			Eigen::Index dim = 0;
-
-			for (const auto& b : m_Blocks)
-			{
-				dim += internal::BlockMatrix::DimensionOf(b);
-			}
-
-			return dim;
+			return Blocks().size();
 		}
 
 		Eigen::Index TotalRows() const
 		{
-			if (BlockType::CompileTimeRows == 1)
-			{
-				return 1;
-			}
-
-			Eigen::Index dim = 0;
-
-			for (const auto& b : m_Blocks)
-			{
-				dim += b.rows();
-			}
-
-			return dim;
+			return AsDerived().TotalRows();
 		}
 
 		Eigen::Index TotalColumns() const
 		{
-			if (BlockType::CompileTimeColumn == 1)
-			{
-				return 1;
-			}
-
-			Eigen::Index dim = 0;
-
-			for (const auto& b : m_Blocks)
-			{
-				dim += b.cols(0);
-			}
-
-			return dim;
+			return AsDerived().TotalColumns();
 		}
 
 		Eigen::Index TotalSize() const
@@ -279,7 +198,7 @@ namespace Hoppy
 		{
 			Eigen::Index count = 0;
 
-			for (const auto& b : m_Blocks)
+			for (const auto& b : AsDerived())
 			{
 				count += internal::BlockMatrix::ValidElementCount(b);
 			}
@@ -287,78 +206,27 @@ namespace Hoppy
 			return count;
 		}
 
-		Eigen::MatrixX<typename BlockType::Scalar> ToFullMatrix() const
+		Eigen::Matrix<Scalar, IsRowVector ? 1 : Eigen::Dynamic, IsVector ? 1 : Eigen::Dynamic> ToFullMatrix() const
 		{
-			Eigen::MatrixX<typename BlockType::Scalar> result =
-			        Eigen::MatrixX<typename BlockType::Scalar>::Zero(TotalDimension(), TotalDimension());
-
-			Eigen::Index i0 = 0;
-			Eigen::Index j0 = 0;
-			for (const auto& b : m_Blocks)
-			{
-				for (Eigen::Index i = 0; i < b.rows(); i++)
-				{
-					for (Eigen::Index j = 0; j < b.cols(); j++)
-					{
-						result(i + i0, j + j0) = b(i, j);
-					}
-				}
-
-				if (BlockType::CompileTimeRows != 1)
-				{
-					i0 += b.rows();
-				}
-				if (BlockType::CompileTimeCols != 1)
-				{
-					j0 += b.cols();
-				}
-			}
-
-			return result;
+			return AsDerived().ToFullMatrix();
 		}
 
-		template <typename OtherBlockType, template <typename, typename> class OtherBlockContainer>
-		bool IsPartitionedAs(const BlockDiagonalMatrix<OtherBlockType, OtherBlockContainer>& other)
+		template <typename OtherDerived>
+		bool IsPartitionedAs(const BlockMatrixBase<OtherDerived>& other)
 		{
-			if (BlockCount() != other.BlockCount())
-			{
-				return false;
-			}
-
-			for (size_t i = 0; i < BlockCount(); i++)
-			{
-				if (internal::BlockMatrix::DimensionOf((*this)[i]) != internal::BlockMatrix::DimensionOf(other[i]))
-				{
-					return false;
-				}
-			}
-
-			return true;
+			return AsDerived().IsPartitionedAs(other);
 		}
 
 		template <typename PartitionList>
 		bool IsPartitionedAs(const PartitionList& partitionList)
 		{
-			if (BlockCount() != partitionList.size())
-			{
-				return false;
-			}
-
-			for (size_t i = 0; i < BlockCount(); i++)
-			{
-				if (internal::BlockMatrix::DimensionOf((*this)[i]) != partitionList.begin()[i])
-				{
-					return false;
-				}
-			}
-
-			return true;
+			return AsDerived().IsPartitionedAs(partitionList);
 		}
 
 		class Iterator
 		{
 		public:
-			Iterator(BlockDiagonalMatrix& matrix, const Eigen::Index index) : r_Matrix(matrix), m_Index(index)
+			Iterator(BlockMatrixBase& matrix, const Eigen::Index index) : r_Matrix(matrix), m_Index(index)
 			{
 				/* NO CODE */
 			}
@@ -386,15 +254,14 @@ namespace Hoppy
 			}
 
 		private:
-			BlockDiagonalMatrix& r_Matrix;
+			BlockMatrixBase& r_Matrix;
 			Eigen::Index m_Index;
 		};
 
 		class ConstIterator
 		{
 		public:
-			ConstIterator(const BlockDiagonalMatrix& matrix, const Eigen::Index index)
-			    : r_Matrix(matrix), m_Index(index)
+			ConstIterator(const BlockMatrixBase& matrix, const Eigen::Index index) : r_Matrix(matrix), m_Index(index)
 			{
 				/* NO CODE */
 			}
@@ -423,7 +290,7 @@ namespace Hoppy
 
 
 		private:
-			const BlockDiagonalMatrix& r_Matrix;
+			const BlockMatrixBase& r_Matrix;
 			Eigen::Index m_Index;
 		};
 
@@ -448,7 +315,7 @@ namespace Hoppy
 		}
 
 
-		friend std::ostream& operator<<(std::ostream& os, const BlockDiagonalMatrix& matrix)
+		friend std::ostream& operator<<(std::ostream& os, const BlockMatrixBase& matrix)
 		{
 			for (const auto& b : matrix)
 			{
@@ -460,6 +327,368 @@ namespace Hoppy
 
 
 	protected:
+		BlockMatrixBase() noexcept = default;
+
+
+	private:
+		BlockContainer& Blocks()
+		{
+			return AsDerived().Blocks();
+		}
+
+		const BlockContainer& Blocks() const
+		{
+			return AsDerived().Blocks();
+		}
+	};
+
+
+	template <typename Derived>
+	struct internal::traits<OneDimensionalBlockMatrixBase<Derived>> : internal::traits<Derived>
+	{
+		/* NO CODE */
+	};
+
+	template <typename Derived>
+	class OneDimensionalBlockMatrixBase : public BlockMatrixBase<OneDimensionalBlockMatrixBase<Derived>>
+	{
+	public:
+		using Base = BlockMatrixBase<OneDimensionalBlockMatrixBase>;
+		friend Base;
+		using BlockType = typename internal::traits<Derived>::BlockType;
+		using Scalar = typename BlockType::Scalar;
+		using BlockContainer = typename internal::traits<Derived>::BlockContainer;
+		static bool constexpr IsVector = internal::traits<Derived>::IsVector;
+		static bool constexpr IsRowVector = internal::traits<Derived>::IsRowVector;
+
+		using Base::BlockCount;
+
+		Derived& AsDerived()
+		{
+			return *static_cast<Derived*>(this);
+		}
+
+		const Derived& AsDerived() const
+		{
+			return *static_cast<const Derived*>(this);
+		}
+
+		template <typename OtherDerived>
+		static Derived PartitionedAs(const OneDimensionalBlockMatrixBase<OtherDerived>& other)
+		{
+			return Derived::PartitionedAs(other);
+		}
+
+		Eigen::NonResizableView<BlockType> Block(const Eigen::Index blockIndex)
+		{
+			return Eigen::NonResizableView<BlockType>{Blocks()[blockIndex]};
+		}
+
+		Eigen::NonResizableView<const BlockType> Block(const Eigen::Index blockIndex) const
+		{
+			return Eigen::NonResizableView<const BlockType>{Blocks()[blockIndex]};
+		}
+
+		Eigen::Index BlockRows(const Eigen::Index index) const
+		{
+			return Block(index).rows();
+		}
+
+		Eigen::Index BlockColumns(const Eigen::Index index) const
+		{
+			return Block(index).cols();
+		}
+
+		Eigen::Index BlockDimension(const Eigen::Index index) const
+		{
+			return AsDerived().BlockDimension(index);
+		}
+
+		Eigen::Index TotalDimension() const
+		{
+			Eigen::Index dim = 0;
+
+			for (Eigen::Index i = 0; i < BlockCount(); i++)
+			{
+				dim += BlockDimension(i);
+			}
+
+			return dim;
+		}
+
+		template <typename OtherDerived>
+		bool IsPartitionedAs(const OneDimensionalBlockMatrixBase<OtherDerived>& other)
+		{
+			if (BlockCount() != other.BlockCount())
+			{
+				return false;
+			}
+
+			for (size_t i = 0; i < BlockCount(); i++)
+			{
+				if (BlockDimension(i) != other.BlockDimension(i))
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		template <typename PartitionList>
+		bool IsPartitionedAs(const PartitionList& partitionList)
+		{
+			if (BlockCount() != partitionList.size())
+			{
+				return false;
+			}
+
+			for (size_t i = 0; i < BlockCount(); i++)
+			{
+				if (BlockDimension(i) != partitionList.begin()[i])
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+
+	protected:
+		OneDimensionalBlockMatrixBase() noexcept = default;
+
+
+	private:
+		BlockContainer& Blocks()
+		{
+			return AsDerived().Blocks();
+		}
+
+		const BlockContainer& Blocks() const
+		{
+			return AsDerived().Blocks();
+		}
+	};
+
+
+	template <typename TBlock, template <typename TBlock2, typename TAlloc = std::allocator<TBlock2>> class TContainer>
+	struct internal::traits<BlockVector<TBlock, TContainer>>
+	{
+		using BlockType = TBlock;
+		using Scalar = typename TBlock::Scalar;
+		using BlockContainer = TContainer<TBlock>;
+		static constexpr bool IsVector = TBlock::IsVectorAtCompileTime;
+		static constexpr bool IsRowVector = TBlock::ColsAtCompileTime == 1;
+
+		static_assert(IsVector, "efcgvhuiytfcghjb");
+	};
+
+	template <typename BlockType,
+	          template <typename TBlock, typename TAlloc = std::allocator<TBlock>> class BlockContainer =
+	                  internal::BlockMatrix::DefaultBlockContainer>
+	class BlockVector : public OneDimensionalBlockMatrixBase<BlockVector<BlockType, BlockContainer>>
+	{
+	public:
+		using Base = OneDimensionalBlockMatrixBase<BlockVector>;
+		friend Base;
+		using Base::Block;
+		using Base::TotalDimension;
+		static constexpr bool IsVector = internal::traits<BlockVector>::IsVector;
+		static constexpr bool IsRowVector = internal::traits<BlockVector>::IsRowVector;
+
+		BlockVector() = default;
+		BlockVector(const BlockVector&) = default;
+		BlockVector(BlockVector&&) noexcept = default;
+		BlockVector& operator=(const BlockVector&) = default;
+		BlockVector& operator=(BlockVector&&) noexcept = default;
+		~BlockVector() = default;
+
+
+		template <typename BlockSizeList>
+		explicit BlockVector(const BlockSizeList& blockSizes)
+		{
+			m_Blocks.reserve(blockSizes.size());
+
+			for (const auto size : blockSizes)
+			{
+				static_assert(std::is_integral<decltype(size)>::value, "Invalid block size list");
+				m_Blocks.emplace_back(size);
+			}
+		}
+
+		template <typename T>
+		BlockVector(const std::initializer_list<T>& blockSizes)
+		{
+			m_Blocks.reserve(blockSizes.size());
+
+			for (const auto size : blockSizes)
+			{
+				static_assert(std::is_integral<decltype(size)>::value, "Invalid block size list");
+				m_Blocks.emplace_back(size);
+			}
+		}
+
+		template <typename OtherDerived>
+		static BlockVector PartitionedAs(const OneDimensionalBlockMatrixBase<OtherDerived>& other)
+		{
+			BlockVector result{};
+
+			result.m_Blocks.reserve(other.BlockCount());
+
+			for (Eigen::Index i = 0; i < other.BlockCount(); i++)
+			{
+				result.m_Blocks.emplace_back(other.BlockDimension(i));
+			}
+
+			return result;
+		}
+
+		Eigen::Index BlockDimension(const Eigen::Index index) const
+		{
+			return Block(index).size();
+		}
+
+		Eigen::Index TotalRows() const
+		{
+			return IsRowVector ? 1 : TotalDimension();
+		}
+
+		Eigen::Index TotalColumns() const
+		{
+			return IsRowVector ? TotalDimension() : 1;
+		}
+
+
+	private:
+		BlockContainer<BlockType>& Blocks()
+		{
+			return m_Blocks;
+		}
+
+		const BlockContainer<BlockType>& Blocks() const
+		{
+			return m_Blocks;
+		}
+
+
+	private:
+		BlockContainer<BlockType> m_Blocks;
+	};
+
+
+	template <typename TBlock, template <typename TBlock2, typename TAlloc = std::allocator<TBlock2>> class TContainer>
+	struct internal::traits<BlockDiagonalMatrix<TBlock, TContainer>>
+	{
+		using BlockType = TBlock;
+		using Scalar = typename TBlock::Scalar;
+		using BlockContainer = TContainer<TBlock>;
+		static constexpr bool IsVector = TBlock::IsVectorAtCompileTime;
+		static constexpr bool IsRowVector = TBlock::IsVectorAtCompileTime && TBlock::RowsAtCompileTime == 1;
+
+		static_assert(!IsVector && !IsRowVector, "gfbdsadfv");
+	};
+
+	template <typename TBlock,
+	          template <typename TBlock2, typename TAlloc = std::allocator<TBlock2>> class BlockContainer =
+	                  internal::BlockMatrix::DefaultBlockContainer>
+	class BlockDiagonalMatrix : public OneDimensionalBlockMatrixBase<BlockDiagonalMatrix<TBlock, BlockContainer>>
+	{
+	public:
+		using Base = OneDimensionalBlockMatrixBase<BlockDiagonalMatrix>;
+		friend Base;
+		using BlockType = typename Base::BlockType;
+		using Base::Block;
+		using Base::BlockCount;
+		using Base::TotalDimension;
+
+		BlockDiagonalMatrix() = default;
+		BlockDiagonalMatrix(const BlockDiagonalMatrix&) = default;
+		BlockDiagonalMatrix(BlockDiagonalMatrix&&) noexcept = default;
+		BlockDiagonalMatrix& operator=(const BlockDiagonalMatrix&) = default;
+		BlockDiagonalMatrix& operator=(BlockDiagonalMatrix&&) noexcept = default;
+		~BlockDiagonalMatrix() = default;
+
+
+		template <typename BlockSizeList>
+		explicit BlockDiagonalMatrix(const BlockSizeList& blockSizes)
+		{
+			m_Blocks.reserve(blockSizes.size());
+
+			for (const auto size : blockSizes)
+			{
+				static_assert(std::is_integral<decltype(size)>::value, "Invalid block size list");
+				m_Blocks.emplace_back(size, size);
+			}
+		}
+
+		template <typename T>
+		BlockDiagonalMatrix(const std::initializer_list<T>& blockSizes)
+		{
+			m_Blocks.reserve(blockSizes.size());
+
+			for (const auto size : blockSizes)
+			{
+				static_assert(std::is_integral<decltype(size)>::value, "Invalid block size list");
+				m_Blocks.emplace_back(size, size);
+			}
+		}
+
+		template <typename OtherDerived>
+		static BlockDiagonalMatrix PartitionedAs(const OneDimensionalBlockMatrixBase<OtherDerived>& other)
+		{
+			BlockDiagonalMatrix result{};
+
+			result.m_Blocks.reserve(other.BlockCount());
+
+			for (Eigen::Index i = 0; i < other.BlockCount(); i++)
+			{
+				result.m_Blocks.emplace_back(other.BlockDimension(i), other.BlockDimension(i));
+			}
+
+			return result;
+		}
+
+		Eigen::Index BlockDimension(const Eigen::Index index) const
+		{
+			assert(Block(index).rows() == Block(index).cols());
+			return Block(index).rows();
+		}
+
+		Eigen::Index BlockRows(const Eigen::Index index) const
+		{
+			return BlockDimension(index);
+		}
+
+		Eigen::Index BlockColumns(const Eigen::Index index) const
+		{
+			return BlockDimension(index);
+		}
+
+		Eigen::Index TotalRows() const
+		{
+			return TotalDimension();
+		}
+
+		Eigen::Index TotalColumns() const
+		{
+			return TotalDimension();
+		}
+
+
+	private:
+		BlockContainer<BlockType>& Blocks()
+		{
+			return m_Blocks;
+		}
+
+		const BlockContainer<BlockType>& Blocks() const
+		{
+			return m_Blocks;
+		}
+
+
+	private:
 		BlockContainer<BlockType> m_Blocks;
 	};
 }  // namespace Hoppy
@@ -473,32 +702,39 @@ namespace Eigen
 	{
 	public:
 		SelfAdjointEigenSolver()
-		    : m_eivec(), m_eivalues(), m_info(InvalidInput), m_isInitialized(false), m_eigenvectorsOk(false)
+		    : m_eigenvectors(), m_eigenvalues(), m_info(InvalidInput), m_isInitialized(false), m_eigenvectorsOk(false)
 		{
 			/* NO CODE */
 		}
 
 		template <typename InputType>
 		EIGEN_DEVICE_FUNC explicit SelfAdjointEigenSolver(const EigenBase<InputType>& matrix,
-								  int options = ComputeEigenvectors)
-		    : m_eivec(), m_eivalues(), m_info(ComputationInfo::Success), m_isInitialized(false), m_eigenvectorsOk(false)
+		                                                  const int options = ComputeEigenvectors)
+		    : m_eigenvectors(), m_eigenvalues(), m_info(ComputationInfo::Success), m_isInitialized(false),
+		      m_eigenvectorsOk(false)
 		{
 			compute(matrix.derived(), options);
 		}
 
 		template <typename BlockType2, template <typename TBlock2, typename TAlloc2> class BlockContainer2>
 		SelfAdjointEigenSolver& compute(const Hoppy::BlockDiagonalMatrix<BlockType2, BlockContainer2>& matrix,
-						int options = ComputeEigenvectors)
+		                                const int options = ComputeEigenvectors)
 		{
 			m_info = ComputationInfo::Success;
-			m_eivec = EigenvectorsType::PartitionedAs(matrix);
-			m_eivalues = RealVectorType::PartitionedAs(matrix);
+			if (options & ComputeEigenvectors)
+			{
+				m_eigenvectors = EigenvectorsType::PartitionedAs(matrix);
+			}
+			m_eigenvalues = RealVectorType::PartitionedAs(matrix);
 
 			for (size_t i = 0; i < matrix.BlockCount(); i++)
 			{
 				SelfAdjointEigenSolver<BlockType> es(matrix[i], options);
-				m_eivec[i] = es.eigenvectors();
-				m_eivalues[i] = es.eigenvalues();
+				if (options & ComputeEigenvectors)
+				{
+					m_eigenvectors[i] = es.eigenvectors();
+				}
+				m_eigenvalues[i] = es.eigenvalues();
 				m_info = std::max(m_info, es.info());
 			}
 
@@ -507,13 +743,22 @@ namespace Eigen
 
 
 		using EigenvectorsType = Hoppy::BlockDiagonalMatrix<BlockType, BlockContainer>;
-		using RealVectorType =
-			Hoppy::BlockDiagonalMatrix<VectorX<typename NumTraits<typename BlockType::Scalar>::Real>>;
+		using RealVectorType = Hoppy::BlockVector<VectorX<typename NumTraits<typename BlockType::Scalar>::Real>>;
+
+		const EigenvectorsType& eigenvectors() const
+		{
+			return m_eigenvectors;
+		}
+
+		const RealVectorType& eigenvalues() const
+		{
+			return m_eigenvalues;
+		}
 
 
 	private:
-		EigenvectorsType m_eivec;
-		RealVectorType m_eivalues;
+		EigenvectorsType m_eigenvectors;
+		RealVectorType m_eigenvalues;
 		ComputationInfo m_info;
 		bool m_isInitialized;
 		bool m_eigenvectorsOk;
