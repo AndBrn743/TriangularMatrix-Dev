@@ -85,7 +85,7 @@ namespace Hoppy
 			{
 				static Eigen::VectorX<T> Create(const Eigen::Index dimension)
 				{
-					return {dimension};
+					return Eigen::VectorX<T>{dimension};
 				}
 			};
 
@@ -94,7 +94,7 @@ namespace Hoppy
 			{
 				static Eigen::RowVectorX<T> Create(const Eigen::Index dimension)
 				{
-					return {dimension};
+					return Eigen::RowVectorX<T>{dimension};
 				}
 			};
 
@@ -137,6 +137,9 @@ namespace Hoppy
 	                  internal::BlockMatrix::DefaultBlockContainer>
 	class BlockDiagonalMatrix
 	{
+		static_assert(!(BlockType::RowsAtCompileTime == 1 && BlockType::ColsAtCompileTime == 1),
+		              "Compile time scalar object cannot be use as BlockDiagonalMatrix blocks");
+
 	public:
 		BlockDiagonalMatrix() = default;
 		BlockDiagonalMatrix(const BlockDiagonalMatrix&) = default;
@@ -156,7 +159,8 @@ namespace Hoppy
 			}
 		}
 
-		BlockDiagonalMatrix(const std::initializer_list<Eigen::Index>& blockSizes)
+		template <typename T>
+		BlockDiagonalMatrix(const std::initializer_list<T>& blockSizes)
 		{
 			m_Blocks.reserve(blockSizes.size());
 
@@ -167,10 +171,26 @@ namespace Hoppy
 			}
 		}
 
-		template <typename SingleBlock>
 		explicit BlockDiagonalMatrix(BlockType&& block)
 		{
-			m_Blocks.emplace_back(static_cast<BlockType>(std::forward<decltype(block)>(block)));
+			m_Blocks.emplace_back(block);
+		}
+
+		explicit BlockDiagonalMatrix(const BlockType& block)
+		{
+			m_Blocks.emplace_back(block);
+		}
+
+		template <typename Derived>
+		explicit BlockDiagonalMatrix(Eigen::MatrixBase<Derived>&& block)
+		{
+			m_Blocks.emplace_back(block);
+		}
+
+		template <typename Derived>
+		explicit BlockDiagonalMatrix(const Eigen::MatrixBase<Derived>& block)
+		{
+			m_Blocks.emplace_back(block);
 		}
 
 		template <typename OtherBlockType, template <typename, typename> class OtherBlockContainer>
@@ -218,6 +238,11 @@ namespace Hoppy
 
 		Eigen::Index TotalRows() const
 		{
+			if (BlockType::CompileTimeRows == 1)
+			{
+				return 1;
+			}
+
 			Eigen::Index dim = 0;
 
 			for (const auto& b : m_Blocks)
@@ -230,6 +255,11 @@ namespace Hoppy
 
 		Eigen::Index TotalColumns() const
 		{
+			if (BlockType::CompileTimeColumn == 1)
+			{
+				return 1;
+			}
+
 			Eigen::Index dim = 0;
 
 			for (const auto& b : m_Blocks)
@@ -274,8 +304,14 @@ namespace Hoppy
 					}
 				}
 
-				i0 += b.rows();
-				j0 += b.cols();
+				if (BlockType::CompileTimeRows != 1)
+				{
+					i0 += b.rows();
+				}
+				if (BlockType::CompileTimeCols != 1)
+				{
+					j0 += b.cols();
+				}
 			}
 
 			return result;
@@ -319,15 +355,98 @@ namespace Hoppy
 			return true;
 		}
 
-		auto begin() const
+		class Iterator
 		{
-			return m_Blocks.begin();
+		public:
+			Iterator(BlockDiagonalMatrix& matrix, const Eigen::Index index) : r_Matrix(matrix), m_Index(index)
+			{
+				/* NO CODE */
+			}
+
+			Eigen::NonResizableView<BlockType> operator*()
+			{
+				return r_Matrix[m_Index];
+			}
+
+			Iterator operator++()
+			{
+				m_Index++;
+				return *this;
+			}
+
+			Iterator operator++(int)
+			{
+				m_Index++;
+				return *this;
+			}
+
+			bool operator!=(const Iterator& other)
+			{
+				return m_Index != other.m_Index || &r_Matrix != &other.r_Matrix;
+			}
+
+		private:
+			BlockDiagonalMatrix& r_Matrix;
+			Eigen::Index m_Index;
+		};
+
+		class ConstIterator
+		{
+		public:
+			ConstIterator(const BlockDiagonalMatrix& matrix, const Eigen::Index index)
+			    : r_Matrix(matrix), m_Index(index)
+			{
+				/* NO CODE */
+			}
+
+			Eigen::NonResizableView<const BlockType> operator*()
+			{
+				return r_Matrix[m_Index];
+			}
+
+			ConstIterator operator++()
+			{
+				m_Index++;
+				return *this;
+			}
+
+			ConstIterator operator++(int)
+			{
+				m_Index++;
+				return *this;
+			}
+
+			bool operator!=(const ConstIterator& other)
+			{
+				return m_Index != other.m_Index || &r_Matrix != &other.r_Matrix;
+			}
+
+
+		private:
+			const BlockDiagonalMatrix& r_Matrix;
+			Eigen::Index m_Index;
+		};
+
+		ConstIterator begin() const
+		{
+			return {*this, 0};
 		}
 
-		auto end() const
+		ConstIterator end() const
 		{
-			return m_Blocks.end();
+			return {*this, BlockCount()};
 		}
+
+		Iterator begin()
+		{
+			return {*this, 0};
+		}
+
+		Iterator end()
+		{
+			return {*this, BlockCount()};
+		}
+
 
 		friend std::ostream& operator<<(std::ostream& os, const BlockDiagonalMatrix& matrix)
 		{
@@ -343,6 +462,60 @@ namespace Hoppy
 	protected:
 		BlockContainer<BlockType> m_Blocks;
 	};
-
-
 }  // namespace Hoppy
+
+
+// ReSharper disable once CppRedundantNamespaceDefinition
+namespace Eigen
+{
+	template <typename BlockType, template <typename TBlock, typename TAlloc> class BlockContainer>
+	class SelfAdjointEigenSolver<Hoppy::BlockDiagonalMatrix<BlockType, BlockContainer>>
+	{
+	public:
+		SelfAdjointEigenSolver()
+		    : m_eivec(), m_eivalues(), m_info(InvalidInput), m_isInitialized(false), m_eigenvectorsOk(false)
+		{
+			/* NO CODE */
+		}
+
+		template <typename InputType>
+		EIGEN_DEVICE_FUNC explicit SelfAdjointEigenSolver(const EigenBase<InputType>& matrix,
+								  int options = ComputeEigenvectors)
+		    : m_eivec(), m_eivalues(), m_info(ComputationInfo::Success), m_isInitialized(false), m_eigenvectorsOk(false)
+		{
+			compute(matrix.derived(), options);
+		}
+
+		template <typename BlockType2, template <typename TBlock2, typename TAlloc2> class BlockContainer2>
+		SelfAdjointEigenSolver& compute(const Hoppy::BlockDiagonalMatrix<BlockType2, BlockContainer2>& matrix,
+						int options = ComputeEigenvectors)
+		{
+			m_info = ComputationInfo::Success;
+			m_eivec = EigenvectorsType::PartitionedAs(matrix);
+			m_eivalues = RealVectorType::PartitionedAs(matrix);
+
+			for (size_t i = 0; i < matrix.BlockCount(); i++)
+			{
+				SelfAdjointEigenSolver<BlockType> es(matrix[i], options);
+				m_eivec[i] = es.eigenvectors();
+				m_eivalues[i] = es.eigenvalues();
+				m_info = std::max(m_info, es.info());
+			}
+
+			return *this;
+		}
+
+
+		using EigenvectorsType = Hoppy::BlockDiagonalMatrix<BlockType, BlockContainer>;
+		using RealVectorType =
+			Hoppy::BlockDiagonalMatrix<VectorX<typename NumTraits<typename BlockType::Scalar>::Real>>;
+
+
+	private:
+		EigenvectorsType m_eivec;
+		RealVectorType m_eivalues;
+		ComputationInfo m_info;
+		bool m_isInitialized;
+		bool m_eigenvectorsOk;
+	};
+}  // namespace Eigen
