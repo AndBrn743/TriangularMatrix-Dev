@@ -63,6 +63,8 @@ namespace Eigen
 
 namespace Hoppy
 {
+	using namespace Eigen;
+
 	template <typename Derived>
 	class TriangularCompressedBase
 	    : public TriangularCompressedCoeffsBase<Derived, Eigen::internal::accessors_level<Derived>::value>
@@ -252,17 +254,16 @@ namespace Hoppy
 		}
 
 
+		using ConstantReturnType = CwiseNullaryOp<internal::scalar_constant_op<Scalar>, PlainObject>;
+		using StorageBaseType = TriangularCompressedBase;
+
+#define EIGEN_CURRENT_STORAGE_BASE_CLASS Hoppy::TriangularCompressedBase
 #define EIGEN_DOC_UNARY_ADDONS(X, Y)
-#define internal Eigen::internal
-#define NumTraits Eigen::NumTraits
-#define CwiseUnaryOp Eigen::CwiseUnaryOp
-#define CwiseUnaryView Eigen::CwiseUnaryView
 #include <Eigen/src/plugins/CommonCwiseUnaryOps.h>
-#undef internal
-#undef NumTraits
-#undef CwiseUnaryOp
-#undef CwiseUnaryView
+#include <Eigen/src/plugins/CommonCwiseBinaryOps.h>
+#include <Eigen/src/plugins/MatrixCwiseBinaryOps.h>
 #undef EIGEN_DOC_UNARY_ADDONS
+#undef EIGEN_CURRENT_STORAGE_BASE_CLASS
 
 		template <typename OtherDerived>
 		/* NOLINTNEXTLINE(*-unconventional-assign-operator) */

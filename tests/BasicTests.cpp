@@ -40,11 +40,11 @@
 //
 // 		if (n == 1)
 // 		{
-// 			m_eivec = matrix;
-// 			m_eivalues.coeffRef(0, 0) = numext::real(m_eivec.coeff(0, 0));
+// 			m_eigenvectors = matrix;
+// 			m_eivalues.coeffRef(0, 0) = numext::real(m_eigenvectors.coeff(0, 0));
 // 			if (computeEigenvectors)
 // 			{
-// 				m_eivec.setOnes(n, n);
+// 				m_eigenvectors.setOnes(n, n);
 // 			}
 // 			m_info = Success;
 // 			m_isInitialized = true;
@@ -54,7 +54,7 @@
 //
 // 		// declare some aliases
 // 		RealVectorType& diag = m_eivalues;
-// 		EigenvectorsType& mat = m_eivec;
+// 		EigenvectorsType& mat = m_eigenvectors;
 //
 // 		// map the matrix coefficients to [-1:1] to avoid over- and underflow.
 // 		mat = matrix.template triangularView<Lower>();
@@ -68,7 +68,7 @@
 // 		m_hcoeffs.resize(n - 1);
 // 		internal::tridiagonalization_inplace(mat, diag, m_subdiag, m_hcoeffs, computeEigenvectors);
 //
-// 		m_info = internal::computeFromTridiagonal_impl(diag, m_subdiag, m_maxIterations, computeEigenvectors, m_eivec);
+// 		m_info = internal::computeFromTridiagonal_impl(diag, m_subdiag, m_maxIterations, computeEigenvectors, m_eigenvectors);
 //
 // 		// scale back the eigen values
 // 		m_eivalues *= scale;
@@ -436,6 +436,35 @@ TEST_CASE("basic", "[BAISC TESTS]")
 		std::cout << "transposed0:\n" << transposed0 << std::endl;
 	}
 
+	SECTION("Conjugate Test")
+	{
+		const auto conjugated0 = hermi.conjugate();
+		// Hoppy::HermitianMatrixXcd conjugated1 = hermi.conjugate();  // TODO: Support this
+		Eigen::MatrixXcd conjugated2 = hermi.conjugate();
+
+		CHECK(conjugated0.rows() == dimension);
+		CHECK(conjugated0.cols() == dimension);
+		CHECK(conjugated0.size() == dimension * dimension);
+		// CHECK(conjugated1.rows() == dimension);
+		// CHECK(conjugated1.cols() == dimension);
+		// CHECK(conjugated1.size() == dimension * dimension);
+		CHECK(conjugated2.rows() == dimension);
+		CHECK(conjugated2.cols() == dimension);
+		CHECK(conjugated2.size() == dimension * dimension);
+
+		for (int i = 0; i < dimension; i++)
+		{
+			for (int j = 0; j < dimension; j++)
+			{
+				CHECK(std::abs(conjugated0.coeff(i, j) - std::conj(hermi.coeff(i, j).Get())) < 1e-12);
+				// CHECK(std::abs(conjugated1.coeff(i, j) - hermi.coeff(j, i).Get()) < 1e-12);
+				CHECK(std::abs(conjugated2.coeff(i, j) - std::conj(hermi.coeff(i, j).Get())) < 1e-12);
+			}
+		}
+
+		std::cout << "conjugated0:\n" << conjugated0 << std::endl;
+	}
+
 	std::cout << hermi << std::endl;
 	std::cout << "=======================================================" << std::endl;
 }
@@ -531,4 +560,10 @@ TEST_CASE("non-resizable view", "[BASIC TESTS]")
 
 		CHECK((t2 - t1).count() < (t1 - t0).count() * 1.1);
 	}
+}
+
+#include "../src/BlockDiagonalMatrix.hpp"
+TEST_CASE("BlockDiagonalMatrices")
+{
+
 }
