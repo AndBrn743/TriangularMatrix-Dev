@@ -465,6 +465,25 @@ TEST_CASE("basic", "[BAISC TESTS]")
 		std::cout << "conjugated0:\n" << conjugated0 << std::endl;
 	}
 
+	SECTION("Block Test (triangular_compressed_block_impl)")
+	{
+		Eigen::internal::triangular_compressed_block_impl<decltype(hermi), Eigen::Dynamic, Eigen::Dynamic> bob(
+		hermi, 1, 2, 3, 2);
+		auto bob1 = bob.eval();
+		Eigen::MatrixXcd bob2 = bob;
+
+		CHECK(bob.rows() == 3);
+		CHECK(bob.cols() == 2);
+		CHECK(bob1.rows() == 3);
+		CHECK(bob1.cols() == 2);
+		CHECK(bob2.rows() == 3);
+		CHECK(bob2.cols() == 2);
+
+		CHECK(hermi(1, 2) == bob(0, 0).Get());
+		CHECK(hermi(1, 2) == bob1(0, 0));
+		CHECK(hermi(1, 2) == bob2(0, 0));
+	}
+
 	std::cout << hermi << std::endl;
 	std::cout << "=======================================================" << std::endl;
 }
