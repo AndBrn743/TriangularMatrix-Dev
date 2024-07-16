@@ -68,7 +68,8 @@
 // 		m_hcoeffs.resize(n - 1);
 // 		internal::tridiagonalization_inplace(mat, diag, m_subdiag, m_hcoeffs, computeEigenvectors);
 //
-// 		m_info = internal::computeFromTridiagonal_impl(diag, m_subdiag, m_maxIterations, computeEigenvectors, m_eigenvectors);
+// 		m_info = internal::computeFromTridiagonal_impl(diag, m_subdiag, m_maxIterations, computeEigenvectors,
+// m_eigenvectors);
 //
 // 		// scale back the eigen values
 // 		m_eivalues *= scale;
@@ -468,7 +469,7 @@ TEST_CASE("basic", "[BAISC TESTS]")
 	SECTION("Block Test (triangular_compressed_block_impl)")
 	{
 		Eigen::internal::triangular_compressed_block_impl<decltype(hermi), Eigen::Dynamic, Eigen::Dynamic> bob(
-		hermi, 1, 2, 3, 2);
+		        hermi, 1, 2, 3, 2);
 		auto bob1 = bob.eval();
 		Eigen::MatrixXcd bob2 = bob;
 
@@ -482,6 +483,36 @@ TEST_CASE("basic", "[BAISC TESTS]")
 		CHECK(hermi(1, 2) == bob(0, 0).Get());
 		CHECK(hermi(1, 2) == bob1(0, 0));
 		CHECK(hermi(1, 2) == bob2(0, 0));
+
+		const std::complex<double> x = bob(0, 0);
+		const std::complex<double> delta(1.0, -1.0);
+		bob(0, 0) += delta;
+		CHECK(std::abs(bob(0, 0) - (x + delta)) < 1e-12);
+		CHECK(hermi(1, 2) == bob(0, 0).Get());
+	}
+
+	SECTION("Block Test (Eigen::Block)")
+	{
+		Eigen::Block<decltype(hermi)> bob(hermi, 1, 2, 3, 2);
+		auto bob1 = bob.eval();
+		Eigen::MatrixXcd bob2 = bob;
+
+		CHECK(bob.rows() == 3);
+		CHECK(bob.cols() == 2);
+		CHECK(bob1.rows() == 3);
+		CHECK(bob1.cols() == 2);
+		CHECK(bob2.rows() == 3);
+		CHECK(bob2.cols() == 2);
+
+		CHECK(hermi(1, 2) == bob(0, 0).Get());
+		CHECK(hermi(1, 2) == bob1(0, 0));
+		CHECK(hermi(1, 2) == bob2(0, 0));
+
+		const std::complex<double> x = bob(0, 0);
+		const std::complex<double> delta(1.0, -1.0);
+		bob(0, 0) += delta;
+		CHECK(std::abs(bob(0, 0) - (x + delta)) < 1e-12);
+		CHECK(hermi(1, 2) == bob(0, 0).Get());
 	}
 
 	std::cout << hermi << std::endl;
@@ -584,5 +615,4 @@ TEST_CASE("non-resizable view", "[BASIC TESTS]")
 #include "../src/BlockDiagonalMatrix.hpp"
 TEST_CASE("BlockDiagonalMatrices")
 {
-
 }

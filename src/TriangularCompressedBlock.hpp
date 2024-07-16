@@ -47,28 +47,28 @@ namespace Eigen
 			}
 
 
-			constexpr auto coeff(const Index row, const Index col) const
+			constexpr decltype(auto) coeff(const Index row, const Index col) const
 			{
 				// std::cout << __FILE__ << ":" << __FUNCTION__ << "(" << row << " + " << startRow() << ", " << col
 				//           << " + " << startCol() << ")" << std::endl;
 				return r_matrix.coeff(row + startRow(), col + startCol());
 			}
 
-			constexpr auto coeffRef(const Index row, const Index col)
+			constexpr decltype(auto) coeffRef(const Index row, const Index col)
 			{
 				// std::cout << __FILE__ << ":" << __FUNCTION__ << "(" << row << " + " << startRow() << ", " << col
 				//           << " + " << startCol() << ")" << std::endl;
 				return r_matrix.coeffRef(row + startRow(), col + startCol());
 			}
 
-			constexpr auto operator()(const Index row, const Index col) const
+			constexpr decltype(auto) operator()(const Index row, const Index col) const
 			{
 				assert(row >= 0 && row < derived().rows() && "Row index out of valid range");
 				assert(col >= 0 && col < derived().cols() && "Column index out of valid range");
 				return coeff(row, col);
 			}
 
-			constexpr auto operator()(const Index row, const Index col)
+			constexpr decltype(auto) operator()(const Index row, const Index col)
 			{
 				assert(row >= 0 && row < derived().rows() && "Row index out of valid range");
 				assert(col >= 0 && col < derived().cols() && "Column index out of valid range");
@@ -162,8 +162,12 @@ namespace Eigen
 			const internal::variable_if_dynamic<Index, BlockCols> m_blockCols;
 		};
 
-		struct TriangularCompressedSubBlockShape{};
-		struct TriangularCompressedSubBlockStorage{};
+		struct TriangularCompressedSubBlockShape
+		{
+		};
+		struct TriangularCompressedSubBlockStorage
+		{
+		};
 
 		template <typename T, int BlockRows, int BlockCols>
 		struct traits<triangular_compressed_block_impl<T, BlockRows, BlockCols>>
@@ -193,6 +197,13 @@ namespace Eigen
 	{
 	public:
 		using Base = internal::triangular_compressed_block_impl<TriangularCompressedMatrix, KBlockRows, KBlockCols>;
+		using CoeffReturnType = decltype(std::declval<Base>().coeff(0, 0));
+		static constexpr int SizeAtCompileTime =
+		        KBlockRows == Dynamic || KBlockCols == Dynamic ? Dynamic : KBlockRows * KBlockCols;
+		static constexpr int MaxSizeAtCompileTime = SizeAtCompileTime;
+		static constexpr int IsVectorAtCompileTime = KBlockRows == 1 || KBlockCols == 1;
+
+		using Base::Base;
 	};
 
 }  // namespace Eigen
