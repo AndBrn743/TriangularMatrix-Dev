@@ -7,6 +7,11 @@
 
 #include "Hoppy.hpp"
 #include "devtools/Tools.hpp"
+#include "src/BlockDiagonalMatrix.hpp"
+
+#include "src/BlockDiagonalMatrix.hpp"
+
+
 
 
 int main()
@@ -97,16 +102,23 @@ int main()
 
 	Eigen::MatrixXcd bevo = bob.ToFullMatrix();
 	std::cout << "bevo:\n" << bevo << std::endl;
-
+	{
+		auto bevo2 = bob.eval();
+		std::cout << "bevo2:\n" << bevo2 << std::endl;
+	}
+	{
+		Eigen::MatrixXcd bevo2 = bob;
+		std::cout << "bevo2:\n" << bevo2 << std::endl;
+	}
 	std::cout << TypeName<Eigen::Block<decltype(bevo)>::PointerType>() << std::endl;
 	std::cout << TypeName<Eigen::Block<decltype(bevo)>::PointerType>() << std::endl;
 
 
 	std::cout << "bob: " << bob.rows() << " x " << bob.cols() << ":\n"
-	          << bob                         //
-	          // << static_cast<Eigen::MatrixXcd>(bob)                         // Error
-	          << " |$| " << bob(0, 0)        //
-	          << " |$| " << bob.coeff(0, 0)  //
+	          << bob << "\n"                         //
+	          << static_cast<Eigen::MatrixXcd>(bob)  //
+	          << " |$| " << bob(0, 0)                //
+	          << " |$| " << bob.coeff(0, 0)          //
 	          << std::endl;
 
 	Eigen::internal::BlockImpl_dense<Eigen::MatrixXd> robert(matt, 1, 2, 4, 3);
@@ -198,6 +210,67 @@ int main()
 	// std::cout << TypeName<Eigen::internal::traits<decltype(bob)>::StorageKind>() << std::endl;
 	// std::cout << TypeName<Eigen::internal::evaluator_traits<decltype(bob)>::Shape>() << std::endl;
 	// headingSouth = bob;
+
+
+
+	// Hoppy::BlockDiagonalMatrix2<Eigen::MatrixXd> bdm({3, 4, 5});
+	// for (auto b : bdm)
+	// {
+	// 	// b.setRandom()
+	// 	b.setOnes();
+	// }
+	// std::cout << "bdm:\n" << bdm << std::endl;
+	//
+	// Hoppy::BlockVector<Eigen::VectorXd> bv = Hoppy::BlockVector<Eigen::VectorXd>::PartitionedAs(bdm);
+	// // std::cout << std::boolalpha << Eigen::VectorXd::RowsAtCompileTime
+	// std::cout << "bv:\n" << bv << std::endl;
+	//
+	// Hoppy::BlockVector<Eigen::RowVectorXd> brv = Hoppy::BlockVector<Eigen::RowVectorXd>::PartitionedAs(bdm);
+	// // std::cout << std::boolalpha << Eigen::VectorXd::RowsAtCompileTime
+	// std::cout << "brv:\n" << brv << std::endl;
+
+	Hoppy::BlockDiagonalMatrix<Eigen::MatrixXd> bdm({3, 4, 5});
+	for (auto b : bdm)
+	{
+		b.setRandom();
+		b = b.transpose().eval();
+	}
+	std::cout << "bdm:\n" << bdm << std::endl;
+
+	Hoppy::BlockDiagonalMatrix<Hoppy::HermitianMatrixXd> bdm2({3, 4, 5});
+	for (auto b : bdm2)
+	{
+		b.FillWithRandom();
+	}
+	std::cout << "bdm2:\n" << bdm2 << std::endl;
+
+	Eigen::SelfAdjointEigenSolver<Hoppy::BlockDiagonalMatrix<Eigen::MatrixXd>> es;  // (bdm2);
+	es.compute(bdm2);
+	std::cout << "es.eigenvalues():\n" << es.eigenvalues() << std::endl;
+	std::cout << "es.eigenvectors():\n" << es.eigenvectors() << std::endl;
+
+	// static_assert(Eigen::VectorXd::IsVectorAtCompileTime, "fyujk");
+	// static_assert(Eigen::RowVectorXd::IsVectorAtCompileTime, "fyujk");
+	// static_assert(Eigen::RowVectorXd::RowsAtCompileTime, "fyujk");
+	//
+	// Hoppy::BlockVector<Eigen::VectorXd> bdv({4, 5, 6});
+	// for (auto b : bdv)
+	// {
+	// 	b.setRandom();
+	// 	std::cout << b.transpose() << std::endl;
+	// }
+	// for (const auto& b : bdv)
+	// {
+	// 	std::cout << b.transpose() << std::endl;
+	// }
+	// std::cout << bdv << std::endl;
+	//
+	// // Hoppy::HermitianMatrixXd h0 = bdm2[0];
+	// // std::cout << "h0:\n" << h0 << std::endl;
+	// // std::cout << "h0  :\n" << Eigen::NonResizableView<Hoppy::HermitianMatrixXd>(h0) << std::endl;
+	// Eigen::VectorXd diag(6);
+	// std::cout << diag.diagonal().transpose() << std::endl;
+	// Eigen::NonResizableView<decltype(diag)> nsd(diag);
 
 	std::cout << "Tester terminated normally" << std::endl;
 }

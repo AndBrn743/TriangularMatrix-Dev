@@ -12,14 +12,15 @@ namespace Eigen
 	{
 		template <typename XprType, int BlockRows, int BlockCols /*, bool InnerPanel = true*/>
 		class triangular_compressed_block_impl
-		    : public Hoppy::TriangularCompressedMatrixBase<Block<XprType, BlockRows, BlockCols>>
+		    : public EigenBase<triangular_compressed_block_impl<XprType, BlockRows, BlockCols>>
 		{
 		public:
-			using Base = TriangularCompressedMatrixBase<Block<XprType, BlockRows, BlockCols>>;
+			using Base = EigenBase<triangular_compressed_block_impl>;
 			using Base::derived;
 			using Scalar = typename traits<XprType>::Scalar;
-			using NestedExpression = typename internal::remove_all<typename XprType::Nested>::type;
-			using BlockType = Block<XprType, BlockRows, BlockCols, true>;
+			using NestedExpression = typename remove_all<typename XprType::Nested>::type;
+			static constexpr int ColsAtCompileTime = BlockCols;
+			static constexpr int RowsAtCompileTime = BlockRows;
 
 
 			triangular_compressed_block_impl() = delete;
@@ -119,6 +120,39 @@ namespace Eigen
 				return result;
 			}
 
+			friend std::ostream& operator<<(std::ostream& os, const triangular_compressed_block_impl& block)
+			{
+				internal::print_matrix(os, block.eval(), EIGEN_DEFAULT_IO_FORMAT);
+				return os;
+			}
+
+			typename internal::eval<triangular_compressed_block_impl>::type eval() const
+			{
+				typename internal::eval<triangular_compressed_block_impl>::type result{};
+				evalTo(result);
+				return result;
+			}
+
+			template <typename Dest>
+			void evalTo(Dest& dst) const
+			{
+				lazyEvalTo(dst);
+			}
+
+			template <typename Dest>
+			void lazyEvalTo(Dest& dst) const
+			{
+				dst.resize(rows(), cols());
+
+				for (Index i = 0; i < rows(); i++)
+				{
+					for (Index j = 0; j < cols(); j++)
+					{
+						dst.coeffRef(i, j) = coeff(i, j);
+					}
+				}
+			}
+
 
 		protected:
 			typename internal::ref_selector<XprType>::non_const_type r_matrix;
@@ -128,13 +162,28 @@ namespace Eigen
 			const internal::variable_if_dynamic<Index, BlockCols> m_blockCols;
 		};
 
+		struct TriangularCompressedSubBlockShape{};
+		struct TriangularCompressedSubBlockStorage{};
 
-		template <typename T, int BlockRows, int BlockCols, int InnerPanel>
-		struct eval<Block<T, BlockRows, BlockCols, InnerPanel>, Hoppy::TriangularCompressed>
+		template <typename T, int BlockRows, int BlockCols>
+		struct traits<triangular_compressed_block_impl<T, BlockRows, BlockCols>>
 		{
-			using type = const Block<T, BlockRows, BlockCols, InnerPanel>&;  // FIXME: should be Eigen::Matrix instead
+			using StorageKind = TriangularCompressedSubBlockStorage;
+			static constexpr int ColsAtCompileTime = BlockCols;
+			static constexpr int RowsAtCompileTime = BlockRows;
 		};
 
+		template <>
+		struct storage_kind_to_shape<TriangularCompressedSubBlockStorage>
+		{
+			using Shape = TriangularCompressedSubBlockShape;
+		};
+
+		template <typename T, int BlockRows, int BlockCols>
+		struct eval<triangular_compressed_block_impl<T, BlockRows, BlockCols>>
+		{
+			using type = Matrix<typename traits<T>::Scalar, BlockRows, BlockCols>;
+		};
 	}  // namespace internal
 
 
