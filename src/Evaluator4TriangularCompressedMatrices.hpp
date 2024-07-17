@@ -597,64 +597,74 @@ namespace Eigen
 				/* NO CODE */
 			}
 
-
-			// ReSharper disable once CppNonExplicitConversionOperator
-			operator Scalar() const  // NOLINT(*-explicit-constructor)
+			Scalar Get() const
 			{
 				return static_cast<const CoeffReturnProxy*>(this)->Get();
 			}
 
-			friend std::ostream& operator<<(std::ostream& os, const CoeffReturnProxyBase& c)
+			// ReSharper disable once CppNonExplicitConversionOperator
+			operator Scalar() const  // NOLINT(*-explicit-constructor)
 			{
-				return os << static_cast<const CoeffReturnProxy&>(c).Get();
+				return Get();
 			}
 
-
-#if defined(CREATE_EVALUATION_OPERATORS)
-#undef CREATE_EVALUATION_OPERATORS
-#endif
-#define CREATE_EVALUATION_OPERATORS(OPERATOR)                                                                          \
-	template <typename T>                                                                                              \
-	friend inline auto operator OPERATOR(const CoeffReturnProxyBase& lhs, const T& rhs)                                \
+#define CREATE_COMPARSION_OPERATOR(OPERATOR)                                                                           \
+	template <typename OtherDerived>                                                                                   \
+	bool operator OPERATOR(const CoeffReturnProxyBase<OtherDerived>& rhs) const                                        \
 	{                                                                                                                  \
-		return static_cast<Scalar>(lhs) OPERATOR rhs;                                                                  \
-	}                                                                                                                  \
-	template <typename T>                                                                                              \
-	friend inline auto operator OPERATOR(const T& lhs, const CoeffReturnProxyBase& rhs)                                \
-	{                                                                                                                  \
-		return lhs OPERATOR static_cast<Scalar>(rhs);                                                                  \
+		return Get() OPERATOR rhs.Get();                                                                               \
 	}
 
-			CREATE_EVALUATION_OPERATORS(+)
-			CREATE_EVALUATION_OPERATORS(-)
-			CREATE_EVALUATION_OPERATORS(*)
-			CREATE_EVALUATION_OPERATORS(/)
+			CREATE_COMPARSION_OPERATOR(==)
+			CREATE_COMPARSION_OPERATOR(!=)
+			CREATE_COMPARSION_OPERATOR(>=)
+			CREATE_COMPARSION_OPERATOR(<=)
+			CREATE_COMPARSION_OPERATOR(>)
+			CREATE_COMPARSION_OPERATOR(<)
+#undef CREATE_COMPARSION_OPERATOR
 
-#undef CREATE_EVALUATION_OPERATORS
-
-			// COMPARISON
-#if defined(CREATE_COMPARISON_OPERATORS)
-#undef CREATE_COMPARISON_OPERATORS
-#endif
-#define CREATE_COMPARISON_OPERATORS(OPERATOR)                                                                          \
+#define CREATE_COMPARSION_OPERATOR_WITH_STD_COMPLEX(OPERATOR)                                                          \
 	template <typename T>                                                                                              \
-	friend inline bool operator OPERATOR(const CoeffReturnProxyBase& lhs, const T& rhs)                                \
+	bool operator OPERATOR(const std::complex<T>& rhs) const                                                           \
 	{                                                                                                                  \
-		return static_cast<Scalar>(lhs) OPERATOR rhs;                                                                  \
+		return Get() OPERATOR rhs;                                                                                     \
 	}                                                                                                                  \
 	template <typename T>                                                                                              \
-	friend inline bool operator OPERATOR(const T& lhs, const CoeffReturnProxyBase& rhs)                                \
+	friend bool operator OPERATOR(const std::complex<T>& lhs, const CoeffReturnProxyBase& rhs)                         \
 	{                                                                                                                  \
-		return lhs OPERATOR static_cast<Scalar>(rhs);                                                                  \
+		return lhs OPERATOR rhs.Get();                                                                                 \
 	}
 
-			CREATE_COMPARISON_OPERATORS(>)
-			CREATE_COMPARISON_OPERATORS(<)
-			CREATE_COMPARISON_OPERATORS(==)
-			CREATE_COMPARISON_OPERATORS(>=)
-			CREATE_COMPARISON_OPERATORS(<=)
+			CREATE_COMPARSION_OPERATOR_WITH_STD_COMPLEX(==)
+			CREATE_COMPARSION_OPERATOR_WITH_STD_COMPLEX(!=)
+			CREATE_COMPARSION_OPERATOR_WITH_STD_COMPLEX(>=)
+			CREATE_COMPARSION_OPERATOR_WITH_STD_COMPLEX(<=)
+			CREATE_COMPARSION_OPERATOR_WITH_STD_COMPLEX(>)
+			CREATE_COMPARSION_OPERATOR_WITH_STD_COMPLEX(<)
+#undef CREATE_COMPARSION_OPERATOR_WITH_STD_COMPLEX
 
-#undef CREATE_COMPARISON_OPERATORS
+#define CREATE_MATH_OPERATOR(OPERATOR)                                                                                 \
+	template <typename OtherDerived>                                                                                   \
+	auto operator OPERATOR(const OtherDerived& rhs) const                                                              \
+	{                                                                                                                  \
+		return Get() OPERATOR rhs;                                                                                     \
+	}                                                                                                                  \
+	template <typename OtherDerived>                                                                                   \
+	friend auto operator OPERATOR(const OtherDerived& lhs, const CoeffReturnProxyBase& rhs)                            \
+	{                                                                                                                  \
+		return lhs OPERATOR rhs.Get();                                                                                 \
+	}
+
+			CREATE_MATH_OPERATOR(+)
+			CREATE_MATH_OPERATOR(-)
+			CREATE_MATH_OPERATOR(*)
+			CREATE_MATH_OPERATOR(/)
+#undef CREATE_MATH_OPERATOR
+
+			friend std::ostream& operator<<(std::ostream& os, const CoeffReturnProxyBase& c)
+			{
+				return os << c.Get();
+			}
 
 		protected:
 			const Scalar* m_data;
@@ -663,3 +673,31 @@ namespace Eigen
 		};
 	}  // namespace internal
 }  // namespace Eigen
+
+
+namespace std
+{
+	template <typename Derived>
+	auto conj(const Eigen::internal::CoeffReturnProxyBase<Derived>& c)
+	{
+		return std::conj(c.Get());
+	}
+
+	template <typename Derived>
+	auto real(const Eigen::internal::CoeffReturnProxyBase<Derived>& c)
+	{
+		return std::real(c.Get());
+	}
+
+	template <typename Derived>
+	auto imag(const Eigen::internal::CoeffReturnProxyBase<Derived>& c)
+	{
+		return std::imag(c.Get());
+	}
+
+	template <typename Derived>
+	auto abs(const Eigen::internal::CoeffReturnProxyBase<Derived>& c)
+	{
+		return std::abs(c.Get());
+	}
+}  // namespace std

@@ -15,25 +15,25 @@ namespace Hoppy
 		using Scalar = typename Eigen::internal::traits<Derived>::Scalar;
 
 
-		auto coeff(const Eigen::Index i, const Eigen::Index j) const
+		Scalar coeff(const Eigen::Index i, const Eigen::Index j) const
 		{
 			// NOTE: this duck is needed by operator <<
 			return Eigen::internal::evaluator<Derived>(derived()).coeff(i, j);
 		}
 
-		auto coeffRef(const Eigen::Index i, const Eigen::Index j)
+		decltype(auto) coeffRef(const Eigen::Index i, const Eigen::Index j)
 		{
 			return Eigen::internal::evaluator<Derived>(derived()).CoeffRef(i, j);
 		}
 
-		constexpr auto operator()(const Eigen::Index i, const Eigen::Index j) const
+		constexpr Scalar operator()(const Eigen::Index i, const Eigen::Index j) const
 		{
 			assert(i >= 0 && i < derived().rows() && "Row index out of valid range");
 			assert(j >= 0 && j < derived().cols() && "Column index out of valid range");
 			return coeff(i, j);
 		}
 
-		constexpr auto operator()(const Eigen::Index i, const Eigen::Index j)
+		constexpr decltype(auto) operator()(const Eigen::Index i, const Eigen::Index j)
 		{
 			assert(i >= 0 && i < derived().rows() && "Row index out of valid range");
 			assert(j >= 0 && j < derived().cols() && "Column index out of valid range");

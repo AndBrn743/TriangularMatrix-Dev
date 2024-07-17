@@ -100,7 +100,7 @@ TEST_CASE("basic", "[BAISC TESTS]")
 		{
 			for (int j = 0; j < hermi.cols(); j++)
 			{
-				CHECK(std::abs(hermi(i, j).Get()) < 1e-12);
+				CHECK(std::abs(hermi(i, j)) < 1e-12);
 			}
 		}
 
@@ -133,28 +133,28 @@ TEST_CASE("basic", "[BAISC TESTS]")
 		{
 			for (int j = 0; j < hermi.cols(); j++)
 			{
-				CHECK(std::abs(hermi.coeff(i, j) - std::conj(hermi.coeff(j, i).Get())) < 1e-12);
+				CHECK(std::abs(hermi.coeff(i, j) - std::conj(hermi.coeff(j, i))) < 1e-12);
 			}
 		}
 		for (int i = 0; i < hermi.rows(); i++)
 		{
 			for (int j = 0; j < hermi.cols(); j++)
 			{
-				CHECK(std::abs(hermi.coeffRef(i, j) - std::conj(hermi.coeffRef(j, i).Get())) < 1e-12);
+				CHECK(std::abs(hermi.coeffRef(i, j) - std::conj(hermi.coeffRef(j, i))) < 1e-12);
 			}
 		}
 		for (int i = 0; i < hermi.rows(); i++)
 		{
 			for (int j = 0; j < hermi.cols(); j++)
 			{
-				CHECK(std::abs(hermi.coeffRef(i, j) - std::conj(hermi(j, i).Get())) < 1e-12);
+				CHECK(std::abs(hermi.coeffRef(i, j) - std::conj(hermi(j, i))) < 1e-12);
 			}
 		}
 		for (int i = 0; i < hermi.rows(); i++)
 		{
 			for (int j = 0; j < hermi.cols(); j++)
 			{
-				CHECK(std::abs(hermi.coeff(i, j) - std::conj(hermi(j, i).Get())) < 1e-12);
+				CHECK(std::abs(hermi.coeff(i, j) - std::conj(hermi(j, i))) < 1e-12);
 			}
 		}
 	}
@@ -173,7 +173,7 @@ TEST_CASE("basic", "[BAISC TESTS]")
 		{
 			for (int j = 0; j < hermi.cols(); j++)
 			{
-				CHECK(std::abs(hermi.coeff(i, j) - std::conj(hermi(j, i).Get())) < 1e-12);
+				CHECK(std::abs(hermi.coeff(i, j) - std::conj(hermi(j, i))) < 1e-12);
 			}
 		}
 	}
@@ -428,9 +428,9 @@ TEST_CASE("basic", "[BAISC TESTS]")
 		{
 			for (int j = 0; j < dimension; j++)
 			{
-				CHECK(std::abs(transposed0.coeff(i, j) - hermi.coeff(j, i).Get()) < 1e-12);
-				CHECK(std::abs(transposed1.coeff(i, j) - hermi.coeff(j, i).Get()) < 1e-12);
-				CHECK(std::abs(transposed2.coeff(i, j) - hermi.coeff(j, i).Get()) < 1e-12);
+				CHECK(std::abs(transposed0.coeff(i, j) - hermi.coeff(j, i)) < 1e-12);
+				CHECK(std::abs(transposed1.coeff(i, j) - hermi.coeff(j, i)) < 1e-12);
+				CHECK(std::abs(transposed2.coeff(i, j) - hermi.coeff(j, i)) < 1e-12);
 			}
 		}
 
@@ -457,9 +457,9 @@ TEST_CASE("basic", "[BAISC TESTS]")
 		{
 			for (int j = 0; j < dimension; j++)
 			{
-				CHECK(std::abs(conjugated0.coeff(i, j) - std::conj(hermi.coeff(i, j).Get())) < 1e-12);
+				CHECK(std::abs(conjugated0.coeff(i, j) - std::conj(hermi.coeff(i, j))) < 1e-12);
 				// CHECK(std::abs(conjugated1.coeff(i, j) - hermi.coeff(j, i).Get()) < 1e-12);
-				CHECK(std::abs(conjugated2.coeff(i, j) - std::conj(hermi.coeff(i, j).Get())) < 1e-12);
+				CHECK(std::abs(conjugated2.coeff(i, j) - std::conj(hermi.coeff(i, j))) < 1e-12);
 			}
 		}
 
@@ -480,7 +480,7 @@ TEST_CASE("basic", "[BAISC TESTS]")
 		CHECK(bob2.rows() == 3);
 		CHECK(bob2.cols() == 2);
 
-		CHECK(hermi(1, 2) == bob(0, 0).Get());
+		CHECK(hermi(1, 2) == bob(0, 0));
 		CHECK(hermi(1, 2) == bob1(0, 0));
 		CHECK(hermi(1, 2) == bob2(0, 0));
 
@@ -488,7 +488,7 @@ TEST_CASE("basic", "[BAISC TESTS]")
 		const std::complex<double> delta(1.0, -1.0);
 		bob(0, 0) += delta;
 		CHECK(std::abs(bob(0, 0) - (x + delta)) < 1e-12);
-		CHECK(hermi(1, 2) == bob(0, 0).Get());
+		CHECK(hermi(1, 2) == bob(0, 0));
 	}
 
 	SECTION("Block Test (Eigen::Block)")
@@ -504,7 +504,7 @@ TEST_CASE("basic", "[BAISC TESTS]")
 		CHECK(bob2.rows() == 3);
 		CHECK(bob2.cols() == 2);
 
-		CHECK(hermi(1, 2) == bob(0, 0).Get());
+		CHECK(hermi(1, 2) == bob(0, 0));
 		CHECK(hermi(1, 2) == bob1(0, 0));
 		CHECK(hermi(1, 2) == bob2(0, 0));
 
@@ -512,7 +512,7 @@ TEST_CASE("basic", "[BAISC TESTS]")
 		const std::complex<double> delta(1.0, -1.0);
 		bob(0, 0) += delta;
 		CHECK(std::abs(bob(0, 0) - (x + delta)) < 1e-12);
-		CHECK(hermi(1, 2) == bob(0, 0).Get());
+		CHECK(hermi(1, 2) == bob(0, 0));
 	}
 
 	std::cout << hermi << std::endl;
