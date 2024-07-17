@@ -47,7 +47,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-generate -Wcoverage-mismatch")
 add_executable(BasicTests BasicTests.cpp)
 target_link_libraries(BasicTests PRIVATE Catch2::Catch2WithMain)
 
+add_executable(BlockDiagonalMatrixTests BlockDiagonalMatrixTests.cpp)
+target_link_libraries(BlockDiagonalMatrixTests PRIVATE Catch2::Catch2WithMain)
+
 include(CTest)
 include(Catch)
 
-add_test(NAME BASIC_TESTS COMMAND BasicTests)
+add_test(NAME BasicTests COMMAND BasicTests)
+add_test(NAME BlockDiagonalMatrixTests COMMAND BlockDiagonalMatrixTests)
